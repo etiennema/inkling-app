@@ -9,8 +9,8 @@ const supabase = createClient(
 const COLORS = ['#000000', '#0066FF', '#FF0000', '#00CC00', '#FFCC00'];
 const BRUSH_SIZE = 5;
 const TIMER_DURATION = 60;
-const MIN_COVERAGE = 1.5;
-const MIN_TIME = 10;
+const MIN_COVERAGE = 0.5;
+const MIN_TIME = 5;
 
 export default function Home() {
   const [screen, setScreen] = useState('loading');
