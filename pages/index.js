@@ -9,8 +9,8 @@ const supabase = createClient(
 const COLORS = ['#000000', '#0066FF', '#FF0000', '#00CC00', '#FFCC00'];
 const BRUSH_SIZE = 5;
 const TIMER_DURATION = 60;
-const MIN_COVERAGE = 0.5;
-const MIN_TIME = 5;
+const MIN_COVERAGE = 0.3;
+const MIN_TIME = 3;
 
 export default function Home() {
   const [screen, setScreen] = useState('loading');
@@ -22,14 +22,12 @@ export default function Home() {
   const [currentStroke, setCurrentStroke] = useState([]);
   const [drawingStartTime, setDrawingStartTime] = useState(null);
   const [firstStrokeTime, setFirstStrokeTime] = useState(null);
-  const [hasSubmittedToday, setHasSubmittedToday] = useState(false);
   const [todayPrompt, setTodayPrompt] = useState('');
   const [promptIndex, setPromptIndex] = useState(0);
   const [gallery, setGallery] = useState([]);
   const [submissionCount, setSubmissionCount] = useState(0);
   const [errorMessage, setErrorMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showFirstTimeWarning, setShowFirstTimeWarning] = useState(false);
   const [countdown, setCountdown] = useState('');
   
   const canvasRef = useRef(null);
@@ -79,7 +77,12 @@ export default function Home() {
         if (error) throw error;
         uid = data.id;
         localStorage.setItem('inkling_user_id', uid);
-        setShowFirstTimeWarning(true);
+        
+        if (localStorage.getItem('inkling_seen_warning') !== 'true') {
+          setUserId(uid);
+          setScreen('first-time');
+          return;
+        }
       } else {
         await supabase
           .from('users')
@@ -91,32 +94,30 @@ export default function Home() {
       await checkTodayStatus(uid, timezone);
     } catch (error) {
       console.error('Init error:', error);
-      setScreen('error');
+      setScreen('landing');
     }
   };
 
   const generateFingerprint = async () => {
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
-  ctx.textBaseline = 'top';
-  ctx.font = '14px Arial';
-  ctx.fillText('fingerprint', 2, 2);
-  const data = canvas.toDataURL();
-  
-  const fingerprint = `${data}-${navigator.userAgent}-${screen.width}x${screen.height}-${new Date().getTimezoneOffset()}`;
-  
-  let hash = 0;
-  for (let i = 0; i < fingerprint.length; i++) {
-    const char = fingerprint.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash;
-  }
-  
-  // Convert to proper UUID format
-  const hex = Math.abs(hash).toString(16).padStart(32, '0');
-  return `${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20,32)}`;
-};
-
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    ctx.textBaseline = 'top';
+    ctx.font = '14px Arial';
+    ctx.fillText('fingerprint', 2, 2);
+    const data = canvas.toDataURL();
+    
+    const fingerprint = `${data}-${navigator.userAgent}-${screen.width}x${screen.height}-${new Date().getTimezoneOffset()}`;
+    
+    let hash = 0;
+    for (let i = 0; i < fingerprint.length; i++) {
+      const char = fingerprint.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash;
+    }
+    
+    const hex = Math.abs(hash).toString(16).padStart(32, '0');
+    return `${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20,32)}`;
+  };
 
   const checkTodayStatus = async (uid, timezone) => {
     try {
@@ -142,7 +143,7 @@ export default function Home() {
       if (prompt) {
         setTodayPrompt(prompt.prompt_text);
       } else {
-        setTodayPrompt('Draw your day');
+        setTodayPrompt('draw');
       }
 
       const startOfToday = new Date();
@@ -164,15 +165,10 @@ export default function Home() {
       setSubmissionCount(count || 0);
 
       if (todaySubmission) {
-        setHasSubmittedToday(true);
         await loadGallery(currentPromptIndex);
         setScreen('already-done');
       } else {
-        if (showFirstTimeWarning || localStorage.getItem('inkling_seen_warning') !== 'true') {
-          setScreen('first-time');
-        } else {
-          setScreen('landing');
-        }
+        setScreen('landing');
       }
     } catch (error) {
       console.error('Check status error:', error);
@@ -198,7 +194,6 @@ export default function Home() {
   const handleStart = () => {
     if (screen === 'first-time') {
       localStorage.setItem('inkling_seen_warning', 'true');
-      setShowFirstTimeWarning(false);
     }
     setScreen('drawing');
     setDrawingStartTime(Date.now());
@@ -254,7 +249,7 @@ export default function Home() {
 
   const endDrawing = (e) => {
     if (!isDrawing) return;
-    e.preventDefault();
+    if (e) e.preventDefault();
     
     setIsDrawing(false);
     if (currentStroke.length > 0) {
@@ -426,20 +421,18 @@ export default function Home() {
 
   if (screen === 'loading') {
     return (
-      <div className="min-h-screen bg-[#F5F5DC] flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-2xl">. . .</div>
-        </div>
+      <div style={{ minHeight: '100vh', backgroundColor: '#F5F5DC', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Helvetica, Arial, sans-serif' }}>
+        <div style={{ textAlign: 'center', fontSize: '24px' }}>. . .</div>
       </div>
     );
   }
 
   if (screen === 'first-time') {
     return (
-      <div className="min-h-screen bg-[#F5F5DC] flex items-center justify-center p-4">
-        <div className="max-w-md w-full">
-          <div className="bg-black text-white p-8 mb-8">
-            <p className="text-sm leading-relaxed">
+      <div style={{ minHeight: '100vh', backgroundColor: '#F5F5DC', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'Helvetica, Arial, sans-serif' }}>
+        <div style={{ maxWidth: '400px', width: '100%' }}>
+          <div style={{ backgroundColor: '#000', color: '#fff', padding: '32px', marginBottom: '32px' }}>
+            <p style={{ fontSize: '14px', lineHeight: '1.6', margin: 0 }}>
               IT IS RECOMMENDED THAT YOU DON'T DRAW ANYTHING YOU WOULDN'T WANT OTHER PEOPLE TO SEE.
               <br /><br />
               ALL DRAWINGS ARE PUBLIC. THERE IS NO PRIVACY.
@@ -447,7 +440,17 @@ export default function Home() {
           </div>
           <button
             onClick={handleStart}
-            className="bg-blue-600 text-white px-8 py-3 text-lg font-medium hover:bg-blue-700 w-full"
+            style={{
+              backgroundColor: '#0066FF',
+              color: '#fff',
+              padding: '12px 32px',
+              fontSize: '16px',
+              fontWeight: '500',
+              border: 'none',
+              cursor: 'pointer',
+              width: '100%',
+              fontFamily: 'Helvetica, Arial, sans-serif'
+            }}
           >
             I UNDERSTAND
           </button>
@@ -458,19 +461,28 @@ export default function Home() {
 
   if (screen === 'landing') {
     return (
-      <div className="min-h-screen bg-[#F5F5DC] flex items-center justify-center p-4">
-        <div className="max-w-md w-full text-center">
-          <h1 className="text-5xl font-bold mb-2">INKLING</h1>
-          <p className="text-sm uppercase mb-8">TINY ACTS OF DRAWING</p>
-          <div className="text-left mb-8 space-y-1">
-            <p>1 PROMPT</p>
-            <p>1 MINUTE</p>
-            <p>1 DRAWING</p>
-            <p className="mt-4">DAILY</p>
+      <div style={{ minHeight: '100vh', backgroundColor: '#F5F5DC', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'Helvetica, Arial, sans-serif' }}>
+        <div style={{ maxWidth: '400px', width: '100%', textAlign: 'center' }}>
+          <h1 style={{ fontSize: '48px', fontWeight: 'bold', margin: '0 0 8px 0' }}>INKLING</h1>
+          <p style={{ fontSize: '12px', textTransform: 'uppercase', margin: '0 0 32px 0', letterSpacing: '0.5px' }}>TINY ACTS OF DRAWING</p>
+          <div style={{ textAlign: 'left', marginBottom: '32px', fontSize: '16px' }}>
+            <p style={{ margin: '4px 0' }}>1 PROMPT</p>
+            <p style={{ margin: '4px 0' }}>1 MINUTE</p>
+            <p style={{ margin: '4px 0' }}>1 DRAWING</p>
+            <p style={{ margin: '16px 0 0 0' }}>DAILY</p>
           </div>
           <button
             onClick={handleStart}
-            className="bg-blue-600 text-white px-8 py-3 text-lg font-medium hover:bg-blue-700"
+            style={{
+              backgroundColor: '#0066FF',
+              color: '#fff',
+              padding: '12px 32px',
+              fontSize: '16px',
+              fontWeight: '500',
+              border: 'none',
+              cursor: 'pointer',
+              fontFamily: 'Helvetica, Arial, sans-serif'
+            }}
           >
             START
           </button>
@@ -481,47 +493,65 @@ export default function Home() {
 
   if (screen === 'drawing' || screen === 'submitting') {
     return (
-      <div className="min-h-screen bg-[#F5F5DC] flex flex-col items-center justify-center p-4">
-        <div className="w-full max-w-2xl">
-          <h2 className="text-2xl text-center mb-4">"{todayPrompt}"</h2>
+      <div style={{ minHeight: '100vh', backgroundColor: '#F5F5DC', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'Helvetica, Arial, sans-serif' }}>
+        <div style={{ width: '100%', maxWidth: '600px' }}>
+          <h2 style={{ fontSize: '24px', textAlign: 'center', marginBottom: '16px', fontWeight: 'normal' }}>"{todayPrompt}"</h2>
           
-          <div className="relative">
-            <canvas
-              ref={canvasRef}
-              onMouseDown={startDrawing}
-              onMouseMove={draw}
-              onMouseUp={endDrawing}
-              onMouseLeave={endDrawing}
-              onTouchStart={startDrawing}
-              onTouchMove={draw}
-              onTouchEnd={endDrawing}
-              className="border-2 border-black mx-auto cursor-crosshair touch-none"
-              style={{ maxWidth: '100%', height: 'auto' }}
-            />
-          </div>
+          <canvas
+            ref={canvasRef}
+            onMouseDown={startDrawing}
+            onMouseMove={draw}
+            onMouseUp={endDrawing}
+            onMouseLeave={endDrawing}
+            onTouchStart={startDrawing}
+            onTouchMove={draw}
+            onTouchEnd={endDrawing}
+            style={{
+              border: '2px solid #000',
+              display: 'block',
+              margin: '0 auto',
+              cursor: 'crosshair',
+              touchAction: 'none',
+              maxWidth: '100%',
+              height: 'auto'
+            }}
+          />
 
-          <div className="flex items-center justify-center gap-4 mt-4 flex-wrap">
-            <div className="flex gap-2">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '16px', marginTop: '16px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '8px' }}>
               {COLORS.map(color => (
                 <button
                   key={color}
                   onClick={() => setSelectedColor(color)}
-                  className="w-8 h-8 rounded-full border-2 transition-all"
                   style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '50%',
+                    border: selectedColor === color ? '3px solid #666' : '2px solid transparent',
                     backgroundColor: color,
-                    borderColor: selectedColor === color ? '#666' : 'transparent',
-                    borderWidth: selectedColor === color ? '3px' : '2px'
+                    cursor: 'pointer',
+                    padding: 0
                   }}
                 />
               ))}
             </div>
             
-            <div className="text-xl font-mono">{formatTime(timeLeft)}</div>
+            <div style={{ fontSize: '20px', fontFamily: 'monospace', minWidth: '50px', textAlign: 'center' }}>{formatTime(timeLeft)}</div>
             
             <button
               onClick={handleSubmit}
               disabled={screen === 'submitting'}
-              className="bg-blue-600 text-white px-6 py-2 font-medium hover:bg-blue-700 disabled:opacity-50"
+              style={{
+                backgroundColor: '#0066FF',
+                color: '#fff',
+                padding: '8px 24px',
+                fontSize: '16px',
+                fontWeight: '500',
+                border: 'none',
+                cursor: screen === 'submitting' ? 'not-allowed' : 'pointer',
+                opacity: screen === 'submitting' ? 0.5 : 1,
+                fontFamily: 'Helvetica, Arial, sans-serif'
+              }}
             >
               {screen === 'submitting' ? 'SUBMITTING...' : 'SUBMIT'}
             </button>
@@ -533,10 +563,10 @@ export default function Home() {
 
   if (screen === 'error-validation') {
     return (
-      <div className="min-h-screen bg-[#F5F5DC] flex items-center justify-center p-4">
-        <div className="max-w-md w-full">
-          <div className="bg-black text-white p-8 mb-8">
-            <p className="text-sm leading-relaxed">
+      <div style={{ minHeight: '100vh', backgroundColor: '#F5F5DC', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'Helvetica, Arial, sans-serif' }}>
+        <div style={{ maxWidth: '400px', width: '100%' }}>
+          <div style={{ backgroundColor: '#000', color: '#fff', padding: '32px', marginBottom: '32px' }}>
+            <p style={{ fontSize: '14px', lineHeight: '1.6', margin: 0 }}>
               {errorMessage === 'blank' && "OOPS. THERE'S NO BLANK CANVASES ALLOWED. YOU'RE ALMOST THERE!"}
               {errorMessage === 'time' && "YOU CAN DO IT! KEEP GOING! FOLLOW ANY THEME."}
               {errorMessage === 'network' && "OOF. PLEASE TRY AGAIN. IF YOU'RE HAVING AN ISSUE, PLEASE LET US KNOW."}
@@ -544,7 +574,17 @@ export default function Home() {
           </div>
           <button
             onClick={handleRetry}
-            className="bg-blue-600 text-white px-8 py-3 text-lg font-medium hover:bg-blue-700 w-full"
+            style={{
+              backgroundColor: '#0066FF',
+              color: '#fff',
+              padding: '12px 32px',
+              fontSize: '16px',
+              fontWeight: '500',
+              border: 'none',
+              cursor: 'pointer',
+              width: '100%',
+              fontFamily: 'Helvetica, Arial, sans-serif'
+            }}
           >
             BACK TO DRAWING
           </button>
@@ -555,10 +595,10 @@ export default function Home() {
 
   if (screen === 'congrats') {
     return (
-      <div className="min-h-screen bg-[#F5F5DC] flex items-center justify-center p-4">
-        <div className="text-center">
-          <h2 className="text-4xl font-bold mb-4">CONGRATS!</h2>
-          <p className="text-lg">
+      <div style={{ minHeight: '100vh', backgroundColor: '#F5F5DC', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'Helvetica, Arial, sans-serif' }}>
+        <div style={{ textAlign: 'center' }}>
+          <h2 style={{ fontSize: '36px', fontWeight: 'bold', marginBottom: '16px' }}>CONGRATS!</h2>
+          <p style={{ fontSize: '18px', lineHeight: '1.5' }}>
             YOU'VE COMPLETED<br />
             {submissionCount} DRAWING{submissionCount !== 1 ? 'S' : ''} SO FAR.
           </p>
@@ -569,38 +609,47 @@ export default function Home() {
 
   if (screen === 'gallery') {
     return (
-      <div className="min-h-screen bg-[#F5F5DC] p-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold">GALLERY</h2>
-            <p className="text-sm mt-2">
+      <div style={{ minHeight: '100vh', backgroundColor: '#F5F5DC', padding: '20px', fontFamily: 'Helvetica, Arial, sans-serif' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+            <h2 style={{ fontSize: '32px', fontWeight: 'bold', margin: '0 0 8px 0' }}>GALLERY</h2>
+            <p style={{ fontSize: '14px', margin: 0 }}>
               {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase()}
             </p>
           </div>
 
           {gallery.length === 0 ? (
-            <div className="text-center max-w-md mx-auto">
-              <p className="mb-4">YOU'RE FIRST TODAY!</p>
+            <div style={{ textAlign: 'center', maxWidth: '400px', margin: '0 auto' }}>
+              <p style={{ marginBottom: '16px' }}>YOU'RE FIRST TODAY!</p>
               <p>COME BACK LATER TO SEE SOME OTHER CREATIONS.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px' }}>
               {gallery.map(item => (
-                <div key={item.id} className="border-2 border-black p-2 bg-white aspect-square">
+                <div key={item.id} style={{ border: '2px solid #000', padding: '8px', backgroundColor: '#fff', aspectRatio: '1' }}>
                   <img 
                     src={item.image_url} 
                     alt="Drawing"
-                    className="w-full h-full object-contain"
+                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                   />
                 </div>
               ))}
             </div>
           )}
 
-          <div className="text-center mt-8">
+          <div style={{ textAlign: 'center', marginTop: '32px' }}>
             <button
               onClick={() => setScreen('already-done')}
-              className="bg-blue-600 text-white px-6 py-2 font-medium hover:bg-blue-700"
+              style={{
+                backgroundColor: '#0066FF',
+                color: '#fff',
+                padding: '8px 24px',
+                fontSize: '16px',
+                fontWeight: '500',
+                border: 'none',
+                cursor: 'pointer',
+                fontFamily: 'Helvetica, Arial, sans-serif'
+              }}
             >
               BACK
             </button>
@@ -612,14 +661,23 @@ export default function Home() {
 
   if (screen === 'already-done') {
     return (
-      <div className="min-h-screen bg-[#F5F5DC] flex items-center justify-center p-4">
-        <div className="text-center">
-          <p className="text-lg mb-4">ALL DONE FOR TODAY.</p>
-          <p className="mb-8">COME BACK TOMORROW!</p>
-          <p className="text-3xl font-mono mb-8">{countdown || getTimeUntilMidnight()}</p>
+      <div style={{ minHeight: '100vh', backgroundColor: '#F5F5DC', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'Helvetica, Arial, sans-serif' }}>
+        <div style={{ textAlign: 'center' }}>
+          <p style={{ fontSize: '18px', marginBottom: '16px' }}>ALL DONE FOR TODAY.</p>
+          <p style={{ marginBottom: '32px' }}>COME BACK TOMORROW!</p>
+          <p style={{ fontSize: '32px', fontFamily: 'monospace', marginBottom: '32px' }}>{countdown || getTimeUntilMidnight()}</p>
           <button
             onClick={() => setScreen('gallery')}
-            className="bg-blue-600 text-white px-6 py-2 font-medium hover:bg-blue-700"
+            style={{
+              backgroundColor: '#0066FF',
+              color: '#fff',
+              padding: '8px 24px',
+              fontSize: '16px',
+              fontWeight: '500',
+              border: 'none',
+              cursor: 'pointer',
+              fontFamily: 'Helvetica, Arial, sans-serif'
+            }}
           >
             BACK TO GALLERY
           </button>
