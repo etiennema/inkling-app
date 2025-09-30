@@ -67,7 +67,7 @@ export default function Home() {
       let uid = localStorage.getItem('inkling_user_id');
       
       if (!uid) {
-        const fingerprint = await generateFingerprint();
+        const fingerprint = generateFingerprint();
         const { data, error } = await supabase
           .from('users')
           .insert({ timezone, id: fingerprint })
@@ -98,26 +98,14 @@ export default function Home() {
     }
   };
 
-  const generateFingerprint = async () => {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    ctx.textBaseline = 'top';
-    ctx.font = '14px Arial';
-    ctx.fillText('fingerprint', 2, 2);
-    const data = canvas.toDataURL();
-    
-    const fingerprint = `${data}-${navigator.userAgent}-${screen.width}x${screen.height}-${new Date().getTimezoneOffset()}`;
-    
-    let hash = 0;
-    for (let i = 0; i < fingerprint.length; i++) {
-      const char = fingerprint.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash = hash & hash;
-    }
-    
-    const hex = Math.abs(hash).toString(16).padStart(32, '0');
-    return `${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20,32)}`;
-  };
+  const generateFingerprint = () => {
+  // Generate a proper random UUID v4
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+};
 
   const checkTodayStatus = async (uid, timezone) => {
     try {
