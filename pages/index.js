@@ -96,24 +96,27 @@ export default function Home() {
   };
 
   const generateFingerprint = async () => {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    ctx.textBaseline = 'top';
-    ctx.font = '14px Arial';
-    ctx.fillText('fingerprint', 2, 2);
-    const data = canvas.toDataURL();
-    
-    const fingerprint = `${data}-${navigator.userAgent}-${screen.width}x${screen.height}-${new Date().getTimezoneOffset()}`;
-    
-    let hash = 0;
-    for (let i = 0; i < fingerprint.length; i++) {
-      const char = fingerprint.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash = hash & hash;
-    }
-    
-    return `${Math.abs(hash)}-${Date.now()}`;
-  };
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.textBaseline = 'top';
+  ctx.font = '14px Arial';
+  ctx.fillText('fingerprint', 2, 2);
+  const data = canvas.toDataURL();
+  
+  const fingerprint = `${data}-${navigator.userAgent}-${screen.width}x${screen.height}-${new Date().getTimezoneOffset()}`;
+  
+  let hash = 0;
+  for (let i = 0; i < fingerprint.length; i++) {
+    const char = fingerprint.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  
+  // Convert to proper UUID format
+  const hex = Math.abs(hash).toString(16).padStart(32, '0');
+  return `${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20,32)}`;
+};
+
 
   const checkTodayStatus = async (uid, timezone) => {
     try {
