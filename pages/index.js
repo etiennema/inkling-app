@@ -496,9 +496,9 @@ if (screen === 'landing') {
 
   if (screen === 'drawing' || screen === 'submitting') {
     return (
-      <div style={{ minHeight: '100vh', backgroundColor: '#F5F5DC', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'Helvetica, Arial, sans-serif' }}>
-        <div style={{ width: '100%', maxWidth: '600px' }}>
-          <h2 style={{ fontSize: '24px', textAlign: 'center', marginBottom: '16px', fontWeight: 'normal' }}>"{todayPrompt}"</h2>
+      <div style={{ height: '100vh', backgroundColor: '#F5F5DC', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'Helvetica, Arial, sans-serif', overflow: 'hidden', boxSizing: 'border-box' }}>
+        <div style={{ width: '100%', maxWidth: '600px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <h2 style={{ fontSize: 'clamp(20px, 4vw, 28px)', textAlign: 'center', marginBottom: '24px', fontWeight: 'normal' }}>"{todayPrompt}"</h2>
           
           <canvas
             ref={canvasRef}
@@ -512,7 +512,7 @@ if (screen === 'landing') {
             style={{
               border: '2px solid #000',
               display: 'block',
-              margin: '0 auto',
+              margin: '0 auto 24px auto',
               cursor: 'crosshair',
               touchAction: 'none',
               maxWidth: '100%',
@@ -520,43 +520,44 @@ if (screen === 'landing') {
             }}
           />
 
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '16px', marginTop: '16px', flexWrap: 'wrap' }}>
-            <div style={{ display: 'flex', gap: '8px' }}>
-              {COLORS.map(color => (
-                <button
-                  key={color}
-                  onClick={() => setSelectedColor(color)}
-                  style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '50%',
-                    border: selectedColor === color ? '3px solid #666' : '2px solid transparent',
-                    backgroundColor: color,
-                    cursor: 'pointer',
-                    padding: 0
-                  }}
-                />
-              ))}
-            </div>
-            
-            <div style={{ fontSize: '20px', fontFamily: 'monospace', minWidth: '50px', textAlign: 'center' }}>{formatTime(timeLeft)}</div>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '24px' }}>
+            {COLORS.map(color => (
+              <button
+                key={color}
+                onClick={() => setSelectedColor(color)}
+                style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '50%',
+                  border: selectedColor === color ? '3px solid #666' : '2px solid #000',
+                  backgroundColor: color,
+                  cursor: 'pointer',
+                  padding: 0
+                }}
+              />
+            ))}
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ fontSize: 'clamp(24px, 5vw, 32px)', fontFamily: 'monospace', minWidth: '80px' }}>{formatTime(timeLeft)}</div>
             
             <button
               onClick={handleSubmit}
               disabled={screen === 'submitting'}
               style={{
-                backgroundColor: '#0066FF',
+                backgroundColor: screen === 'submitting' ? 'transparent' : '#0066FF',
                 color: '#fff',
-                padding: '8px 24px',
-                fontSize: '16px',
+                padding: '12px 32px',
+                fontSize: 'clamp(16px, 3.5vw, 20px)',
                 fontWeight: '500',
-                border: 'none',
-                cursor: screen === 'submitting' ? 'not-allowed' : 'pointer',
-                opacity: screen === 'submitting' ? 0.5 : 1,
-                fontFamily: 'Helvetica, Arial, sans-serif'
+                border: screen === 'submitting' ? 'none' : '2px solid #0066FF',
+                borderRadius: '0',
+                cursor: screen === 'submitting' ? 'default' : 'pointer',
+                fontFamily: 'Helvetica, Arial, sans-serif',
+                minWidth: '140px'
               }}
             >
-              {screen === 'submitting' ? 'SUBMITTING...' : 'SUBMIT'}
+              {screen === 'submitting' ? '. . .' : 'SUBMIT'}
             </button>
           </div>
         </div>
