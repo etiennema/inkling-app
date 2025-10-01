@@ -449,11 +449,11 @@ export default function Home() {
 
 if (screen === 'landing') {
     return (
-      <div style={{ minHeight: '100vh', backgroundColor: '#F5F5DC', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'Helvetica, Arial, sans-serif' }}>
-        <div style={{ maxWidth: '400px', width: '100%' }}>
+      <div style={{ minHeight: '100vh', backgroundColor: '#F5F5DC', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'Helvetica, Arial, sans-serif', overflow: 'hidden' }}>
+        <div style={{ maxWidth: '400px', width: '100%', textAlign: 'center' }}>
           <h1 style={{ fontSize: 'clamp(40px, 10vw, 72px)', fontWeight: 'bold', margin: '0 0 16px 0', letterSpacing: '-2px' }}>INKLING</h1>
           <p style={{ fontSize: 'clamp(11px, 2.5vw, 14px)', textTransform: 'uppercase', margin: '0 0 60px 0', letterSpacing: '1px' }}>TINY ACTS OF DRAWING</p>
-          <div style={{ marginBottom: '60px', fontSize: 'clamp(14px, 3.5vw, 18px)', lineHeight: '1.8' }}>
+          <div style={{ marginBottom: '60px', fontSize: 'clamp(14px, 3.5vw, 18px)', lineHeight: '1.8', textAlign: 'left' }}>
             <p style={{ margin: '0 0 8px 0' }}>1 PROMPT</p>
             <p style={{ margin: '0 0 8px 0' }}>1 MINUTE</p>
             <p style={{ margin: '0 0 8px 0' }}>1 DRAWING</p>
@@ -471,7 +471,9 @@ if (screen === 'landing') {
               borderRadius: '0',
               cursor: 'pointer',
               fontFamily: 'Helvetica, Arial, sans-serif',
-              letterSpacing: '1px'
+              letterSpacing: '1px',
+              width: '100%',
+              maxWidth: '280px'
             }}
           >
             START
