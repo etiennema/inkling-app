@@ -517,7 +517,7 @@ if (screen === 'landing') {
 
   if (screen === 'drawing' || screen === 'submitting') {
     return (
-      <div style={{ height: '100vh', backgroundColor: '#F5F5DC', display: 'flex', flexDirection: 'column', padding: '20px 20px 0 20px', fontFamily: 'Helvetica, Arial, sans-serif', overflow: 'hidden', boxSizing: 'border-box' }}>
+      <div style={{ height: '100dvh', backgroundColor: '#F5F5DC', display: 'flex', flexDirection: 'column', padding: '20px 20px 0 20px', fontFamily: 'Helvetica, Arial, sans-serif', overflow: 'hidden', boxSizing: 'border-box' }}>
         <h2 style={{ fontSize: 'clamp(28px, 6vw, 40px)', textAlign: 'center', margin: '0 0 16px 0', fontWeight: 'bold', textTransform: 'uppercase' }}>"{todayPrompt}"</h2>
         
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 0, marginBottom: '16px' }}>
