@@ -200,9 +200,15 @@ export default function Home() {
   const canvas = canvasRef.current;
   if (!canvas) return;
 
-  const availableWidth = window.innerWidth - 32;
-  const availableHeight = window.innerHeight - 320; // Increased from 280
+  // Get the canvas container's actual available height
+  const container = canvas.parentElement;
+  const containerHeight = container ? container.clientHeight : window.innerHeight - 320;
   
+  // Calculate available dimensions
+  const availableWidth = window.innerWidth - 32;
+  const availableHeight = Math.max(containerHeight - 20, 200); // At least 200px, with 20px margin
+  
+  // Make canvas fit within both constraints, keeping it square
   const size = Math.min(availableWidth, availableHeight, 600);
   
   canvas.width = size;
