@@ -200,11 +200,9 @@ export default function Home() {
   const canvas = canvasRef.current;
   if (!canvas) return;
 
-  // Calculate available space
-  const availableWidth = window.innerWidth - 32; // 16px padding on each side
-  const availableHeight = window.innerHeight - 280; // Space for prompt, controls, buttons
+  const availableWidth = window.innerWidth - 32;
+  const availableHeight = window.innerHeight - 320; // Increased from 280
   
-  // Make canvas fit within both constraints, keeping it square
   const size = Math.min(availableWidth, availableHeight, 600);
   
   canvas.width = size;
