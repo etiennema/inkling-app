@@ -367,11 +367,17 @@ export default function Home() {
 
       setSubmissionCount(prev => prev + 1);
       await loadGallery(promptIndex);
-      setScreen('congrats');
       
+      // White flash effect
+      document.body.style.backgroundColor = '#FFFFFF';
       setTimeout(() => {
-        setScreen('gallery');
-      }, 2000);
+        document.body.style.backgroundColor = '';
+        setScreen('congrats');
+        
+        setTimeout(() => {
+          setScreen('gallery');
+        }, 2000);
+      }, 100);
 
     } catch (error) {
       console.error('Submit error:', error);
@@ -384,7 +390,7 @@ export default function Home() {
       setIsSubmitting(false);
     }
   };
-
+  
   const handleRetry = () => {
     setStrokes([]);
     setCurrentStroke([]);
