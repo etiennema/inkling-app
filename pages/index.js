@@ -77,8 +77,7 @@ export default function Home() {
         if (error) throw error;
         uid = data.id;
         localStorage.setItem('inkling_user_id', uid);
-      }
-      
+
       } else {
         await supabase
           .from('users')
