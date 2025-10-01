@@ -453,11 +453,11 @@ if (screen === 'landing') {
         <div style={{ maxWidth: '400px', width: '100%', textAlign: 'center' }}>
           <h1 style={{ fontSize: 'clamp(50px, 12.5vw, 90px)', fontWeight: 'bold', margin: '0 0 16px 0', letterSpacing: '-2px' }}>INKLING</h1>
           <p style={{ fontSize: 'clamp(11px, 2.5vw, 14px)', textTransform: 'uppercase', margin: '0 0 60px 0', letterSpacing: '1px' }}>TINY ACTS OF DRAWING</p>
-          <div style={{ marginBottom: '60px', fontSize: 'clamp(14px, 3.5vw, 18px)', lineHeight: '1.8' }}>
-            <p style={{ margin: '0 0 8px 0' }}>1 PROMPT</p>
-            <p style={{ margin: '0 0 8px 0' }}>1 MINUTE</p>
-            <p style={{ margin: '0 0 8px 0' }}>1 DRAWING</p>
-            <p style={{ margin: '32px 0 0 0' }}>DAILY</p>
+          <div style={{ marginBottom: '60px', fontSize: 'clamp(14px, 3.5vw, 18px)', lineHeight: '1.2' }}>
+            <p style={{ margin: '0' }}>1 PROMPT</p>
+            <p style={{ margin: '0' }}>1 MINUTE</p>
+            <p style={{ margin: '0' }}>1 DRAWING</p>
+            <p style={{ margin: '32px 0 0 0', fontWeight: 'bold' }}>DAILY</p>
           </div>
           <button
             onClick={handleStart}
