@@ -417,31 +417,37 @@ export default function Home() {
 
   if (screen === 'first-time') {
     return (
-      <div style={{ minHeight: '100vh', backgroundColor: '#F5F5DC', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'Helvetica, Arial, sans-serif' }}>
-        <div style={{ maxWidth: '400px', width: '100%' }}>
-          <div style={{ backgroundColor: '#000', color: '#fff', padding: '32px', marginBottom: '32px' }}>
-            <p style={{ fontSize: '14px', lineHeight: '1.6', margin: 0 }}>
-              IT IS RECOMMENDED THAT YOU DON'T DRAW ANYTHING YOU WOULDN'T WANT OTHER PEOPLE TO SEE.
-              <br /><br />
-              ALL DRAWINGS ARE PUBLIC. THERE IS NO PRIVACY.
+      <div style={{ height: '100vh', backgroundColor: '#F5F5DC', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'Helvetica, Arial, sans-serif', overflow: 'hidden', boxSizing: 'border-box' }}>
+        <div style={{ maxWidth: '600px', width: '100%' }}>
+          <div style={{ backgroundColor: '#000', color: '#fff', padding: '48px', marginBottom: '48px' }}>
+            <p style={{ fontSize: 'clamp(16px, 3.5vw, 20px)', lineHeight: '1.6', margin: '0 0 24px 0' }}>
+              HI!
+            </p>
+            <p style={{ fontSize: 'clamp(16px, 3.5vw, 20px)', lineHeight: '1.6', margin: '0 0 24px 0' }}>
+              THIS IS AN EXPERIMENT. THINGS MIGHT BREAK!
+            </p>
+            <p style={{ fontSize: 'clamp(16px, 3.5vw, 20px)', lineHeight: '1.6', margin: '0 0 24px 0' }}>
+              BE NICE, DON'T OVERTHINK IT, AND HAVE SOME FUN!
+            </p>
+            <p style={{ fontSize: 'clamp(16px, 3.5vw, 20px)', lineHeight: '1.6', margin: '0' }}>
+              —ETIENNE
             </p>
           </div>
-          <button
-            onClick={handleStart}
-            style={{
-              backgroundColor: '#0066FF',
-              color: '#fff',
-              padding: '12px 32px',
-              fontSize: '16px',
-              fontWeight: '500',
-              border: 'none',
-              cursor: 'pointer',
-              width: '100%',
-              fontFamily: 'Helvetica, Arial, sans-serif'
-            }}
-          >
-            I UNDERSTAND
-          </button>
+          <div style={{ textAlign: 'right' }}>
+            <button
+              onClick={handleStart}
+              style={{
+                backgroundColor: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '0'
+              }}
+            >
+              <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 30H50M50 30L35 15M50 30L35 45" stroke="#0066FF" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
     );
