@@ -450,7 +450,7 @@ export default function Home() {
 
   if (screen === 'first-time') {
     return (
-      <div style={{ height: '100vh', backgroundColor: '#F5F5DC', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'Helvetica, Arial, sans-serif', overflow: 'hidden', boxSizing: 'border-box' }}>
+      <div style={{ height: '100vh', minHeight: '-webkit-fill-available', backgroundColor: '#F5F5DC', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'Helvetica, Arial, sans-serif', overflow: 'hidden', boxSizing: 'border-box', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}>
         <div style={{ maxWidth: '600px', width: '100%' }}>
           <div style={{ backgroundColor: '#000', color: '#fff', padding: '48px', marginBottom: '48px' }}>
             <p style={{ fontSize: 'clamp(16px, 3.5vw, 20px)', lineHeight: '1.6', margin: '0 0 24px 0' }}>
@@ -488,11 +488,11 @@ export default function Home() {
 
 if (screen === 'landing') {
     return (
-      <div style={{ height: '100vh', backgroundColor: '#F5F5DC', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'Helvetica, Arial, sans-serif', overflow: 'hidden', boxSizing: 'border-box' }}>
+      <div style={{ height: '100vh', minHeight: '-webkit-fill-available', backgroundColor: '#F5F5DC', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'Helvetica, Arial, sans-serif', overflow: 'hidden', boxSizing: 'border-box', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}>
         <div style={{ maxWidth: '600px', width: '100%', textAlign: 'center' }}>
-          <h1 style={{ fontSize: 'clamp(75px, 18vw, 135px)', fontWeight: 'bold', margin: '0 0 24px 0', letterSpacing: '-2px' }}>INKLING</h1>
-          <p style={{ fontSize: 'clamp(16px, 3.5vw, 21px)', textTransform: 'uppercase', margin: '0 0 90px 0', letterSpacing: '1px' }}>TINY ACTS OF DRAWING</p>
-          <div style={{ marginBottom: '90px', fontSize: 'clamp(21px, 5vw, 27px)', lineHeight: '1.2' }}>
+          <h1 style={{ fontSize: 'clamp(50px, 12.5vw, 90px)', fontWeight: 'bold', margin: '0 0 16px 0', letterSpacing: '-2px' }}>INKLING</h1>
+          <p style={{ fontSize: 'clamp(11px, 2.5vw, 14px)', textTransform: 'uppercase', margin: '0 0 60px 0', letterSpacing: '1px' }}>TINY ACTS OF DRAWING</p>
+          <div style={{ marginBottom: '60px', fontSize: 'clamp(21px, 5vw, 27px)', lineHeight: '1.2' }}>
             <p style={{ margin: '0' }}>1 PROMPT</p>
             <p style={{ margin: '0' }}>1 MINUTE</p>
             <p style={{ margin: '0' }}>1 DRAWING</p>
@@ -515,82 +515,6 @@ if (screen === 'landing') {
             }}
           >
             START
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (screen === 'drawing' || screen === 'submitting') {
-    return (
-      <div style={{ height: '100dvh', backgroundColor: '#F5F5DC', display: 'flex', flexDirection: 'column', padding: '20px 20px 0 20px', fontFamily: 'Helvetica, Arial, sans-serif', overflow: 'hidden', boxSizing: 'border-box' }}>
-        <h2 style={{ fontSize: 'clamp(28px, 6vw, 40px)', textAlign: 'center', margin: '0 0 16px 0', fontWeight: 'bold', textTransform: 'uppercase' }}>"{todayPrompt}"</h2>
-        
-        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 0, marginBottom: '16px' }}>
-          <canvas
-            ref={canvasRef}
-            onMouseDown={startDrawing}
-            onMouseMove={draw}
-            onMouseUp={endDrawing}
-            onMouseLeave={endDrawing}
-            onTouchStart={startDrawing}
-            onTouchMove={draw}
-            onTouchEnd={endDrawing}
-            style={{
-              border: '2px solid #000',
-              cursor: 'crosshair',
-              touchAction: 'none',
-              maxWidth: 'calc(100vw - 40px)',
-              maxHeight: '100%',
-              width: 'auto',
-              height: 'auto'
-            }}
-          />
-        </div>
-
-        <div style={{ borderBottom: '2px solid #000', paddingBottom: '16px', margin: '0 -20px', paddingLeft: '20px', paddingRight: '20px' }}>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '12px' }}>
-            {COLORS.map(color => (
-              <button
-                key={color}
-                onClick={() => setSelectedColor(color)}
-                style={{
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: '50%',
-                  border: selectedColor === color ? '4.2px solid #666' : '2px solid #000',
-                  backgroundColor: color,
-                  cursor: 'pointer',
-                  padding: 0,
-                  flexShrink: 0
-                }}
-              />
-            ))}
-          </div>
-        </div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 2px 1fr', alignItems: 'stretch', flex: '0 0 auto', margin: '0 -20px' }}>
-          <div style={{ fontSize: 'clamp(24px, 5vw, 32px)', fontFamily: 'Helvetica, Arial, sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px 0' }}>
-            {formatTime(timeLeft)}
-          </div>
-          
-          <div style={{ backgroundColor: '#000', width: '2px' }}></div>
-          
-          <button
-            onClick={handleSubmit}
-            disabled={screen === 'submitting'}
-            style={{
-              backgroundColor: screen === 'submitting' ? '#F5F5DC' : '#0066FF',
-              color: screen === 'submitting' ? '#000' : '#fff',
-              fontSize: 'clamp(16px, 3.5vw, 20px)',
-              fontWeight: '500',
-              border: 'none',
-              cursor: screen === 'submitting' ? 'default' : 'pointer',
-              fontFamily: 'Helvetica, Arial, sans-serif',
-              padding: '20px 0'
-            }}
-          >
-            {screen === 'submitting' ? '.'.repeat(submittingDots) : 'SUBMIT'}
           </button>
         </div>
       </div>
