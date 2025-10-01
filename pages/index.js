@@ -377,7 +377,7 @@ export default function Home() {
         setTimeout(() => {
           setScreen('gallery');
         }, 2000);
-      }, 100);
+      }, 200);
 
     } catch (error) {
       console.error('Submit error:', error);
@@ -390,7 +390,7 @@ export default function Home() {
       setIsSubmitting(false);
     }
   };
-  
+
   const handleRetry = () => {
     setStrokes([]);
     setCurrentStroke([]);
@@ -526,26 +526,28 @@ if (screen === 'landing') {
             }}
           />
 
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '24px' }}>
-            {COLORS.map(color => (
-              <button
-                key={color}
-                onClick={() => setSelectedColor(color)}
-                style={{
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: '50%',
-                  border: selectedColor === color ? '3px solid #666' : '2px solid #000',
-                  backgroundColor: color,
-                  cursor: 'pointer',
-                  padding: 0
-                }}
-              />
-            ))}
+          <div style={{ borderBottom: '2px solid #000', paddingBottom: '16px', marginBottom: '16px' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '12px' }}>
+              {COLORS.map(color => (
+                <button
+                  key={color}
+                  onClick={() => setSelectedColor(color)}
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '50%',
+                    border: selectedColor === color ? '4.2px solid #666' : '2px solid #000',
+                    backgroundColor: color,
+                    cursor: 'pointer',
+                    padding: 0
+                  }}
+                />
+              ))}
+            </div>
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ fontSize: 'clamp(24px, 5vw, 32px)', fontFamily: 'monospace', minWidth: '80px' }}>{formatTime(timeLeft)}</div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'stretch', gap: '16px' }}>
+            <div style={{ fontSize: 'clamp(24px, 5vw, 32px)', fontFamily: 'monospace', display: 'flex', alignItems: 'center' }}>{formatTime(timeLeft)}</div>
             
             <button
               onClick={handleSubmit}
@@ -553,14 +555,14 @@ if (screen === 'landing') {
               style={{
                 backgroundColor: screen === 'submitting' ? 'transparent' : '#0066FF',
                 color: '#fff',
-                padding: '12px 32px',
+                padding: '12px 0',
                 fontSize: 'clamp(16px, 3.5vw, 20px)',
                 fontWeight: '500',
                 border: screen === 'submitting' ? 'none' : '2px solid #0066FF',
                 borderRadius: '0',
                 cursor: screen === 'submitting' ? 'default' : 'pointer',
                 fontFamily: 'Helvetica, Arial, sans-serif',
-                minWidth: '140px'
+                flex: 1
               }}
             >
               {screen === 'submitting' ? '. . .' : 'SUBMIT'}
