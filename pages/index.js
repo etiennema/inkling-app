@@ -447,29 +447,31 @@ export default function Home() {
     );
   }
 
-  if (screen === 'landing') {
+if (screen === 'landing') {
     return (
       <div style={{ minHeight: '100vh', backgroundColor: '#F5F5DC', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'Helvetica, Arial, sans-serif' }}>
-        <div style={{ maxWidth: '400px', width: '100%', textAlign: 'center' }}>
-          <h1 style={{ fontSize: '48px', fontWeight: 'bold', margin: '0 0 8px 0' }}>INKLING</h1>
-          <p style={{ fontSize: '12px', textTransform: 'uppercase', margin: '0 0 32px 0', letterSpacing: '0.5px' }}>TINY ACTS OF DRAWING</p>
-          <div style={{ textAlign: 'left', marginBottom: '32px', fontSize: '16px' }}>
-            <p style={{ margin: '4px 0' }}>1 PROMPT</p>
-            <p style={{ margin: '4px 0' }}>1 MINUTE</p>
-            <p style={{ margin: '4px 0' }}>1 DRAWING</p>
-            <p style={{ margin: '16px 0 0 0' }}>DAILY</p>
+        <div style={{ maxWidth: '400px', width: '100%' }}>
+          <h1 style={{ fontSize: 'clamp(40px, 10vw, 72px)', fontWeight: 'bold', margin: '0 0 16px 0', letterSpacing: '-2px' }}>INKLING</h1>
+          <p style={{ fontSize: 'clamp(11px, 2.5vw, 14px)', textTransform: 'uppercase', margin: '0 0 60px 0', letterSpacing: '1px' }}>TINY ACTS OF DRAWING</p>
+          <div style={{ marginBottom: '60px', fontSize: 'clamp(14px, 3.5vw, 18px)', lineHeight: '1.8' }}>
+            <p style={{ margin: '0 0 8px 0' }}>1 PROMPT</p>
+            <p style={{ margin: '0 0 8px 0' }}>1 MINUTE</p>
+            <p style={{ margin: '0 0 8px 0' }}>1 DRAWING</p>
+            <p style={{ margin: '32px 0 0 0' }}>DAILY</p>
           </div>
           <button
             onClick={handleStart}
             style={{
               backgroundColor: '#0066FF',
               color: '#fff',
-              padding: '12px 32px',
-              fontSize: '16px',
+              padding: '16px 48px',
+              fontSize: 'clamp(14px, 3.5vw, 18px)',
               fontWeight: '500',
               border: 'none',
+              borderRadius: '0',
               cursor: 'pointer',
-              fontFamily: 'Helvetica, Arial, sans-serif'
+              fontFamily: 'Helvetica, Arial, sans-serif',
+              letterSpacing: '1px'
             }}
           >
             START
