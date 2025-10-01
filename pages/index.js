@@ -197,19 +197,25 @@ export default function Home() {
 };
 
   const initCanvas = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+  const canvas = canvasRef.current;
+  if (!canvas) return;
 
-    const size = Math.min(window.innerWidth - 40, 600);
-    canvas.width = size;
-    canvas.height = size;
+  // Calculate available space
+  const availableWidth = window.innerWidth - 32; // 16px padding on each side
+  const availableHeight = window.innerHeight - 280; // Space for prompt, controls, buttons
+  
+  // Make canvas fit within both constraints, keeping it square
+  const size = Math.min(availableWidth, availableHeight, 600);
+  
+  canvas.width = size;
+  canvas.height = size;
 
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#F5F5DC';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-  };
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#F5F5DC';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+};
 
   const startDrawing = (e) => {
     if (screen !== 'drawing') return;
@@ -514,7 +520,7 @@ if (screen === 'landing') {
       </div>
     );
   }
-  
+
   if (screen === 'drawing' || screen === 'submitting') {
     return (
       <div style={{ height: '100vh', minHeight: '-webkit-fill-available', backgroundColor: '#F5F5DC', display: 'flex', flexDirection: 'column', padding: '16px 16px 0 16px', fontFamily: 'Helvetica, Arial, sans-serif', overflow: 'hidden', boxSizing: 'border-box', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}>
