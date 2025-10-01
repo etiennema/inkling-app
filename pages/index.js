@@ -517,7 +517,7 @@ if (screen === 'landing') {
 
   if (screen === 'drawing' || screen === 'submitting') {
     return (
-      <div style={{ height: '100vh', backgroundColor: '#F5F5DC', display: 'flex', flexDirection: 'column', padding: '20px', fontFamily: 'Helvetica, Arial, sans-serif', overflow: 'hidden', boxSizing: 'border-box' }}>
+      <div style={{ height: '100vh', backgroundColor: '#F5F5DC', display: 'flex', flexDirection: 'column', padding: '20px 20px 0 20px', fontFamily: 'Helvetica, Arial, sans-serif', overflow: 'hidden', boxSizing: 'border-box' }}>
         <h2 style={{ fontSize: 'clamp(28px, 6vw, 40px)', textAlign: 'center', margin: '0 0 16px 0', fontWeight: 'bold', textTransform: 'uppercase' }}>"{todayPrompt}"</h2>
         
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 0, marginBottom: '16px' }}>
@@ -534,16 +534,15 @@ if (screen === 'landing') {
               border: '2px solid #000',
               cursor: 'crosshair',
               touchAction: 'none',
-              maxWidth: '100%',
+              maxWidth: 'calc(100vw - 40px)',
               maxHeight: '100%',
               width: 'auto',
-              height: 'auto',
-              objectFit: 'contain'
+              height: 'auto'
             }}
           />
         </div>
 
-        <div style={{ borderBottom: '2px solid #000', paddingBottom: '16px' }}>
+        <div style={{ borderBottom: '2px solid #000', paddingBottom: '16px', margin: '0 -20px', paddingLeft: '20px', paddingRight: '20px' }}>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '12px' }}>
             {COLORS.map(color => (
               <button
@@ -564,8 +563,8 @@ if (screen === 'landing') {
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 2px 1fr', alignItems: 'stretch', height: '60px', marginTop: '16px' }}>
-          <div style={{ fontSize: 'clamp(24px, 5vw, 32px)', fontFamily: 'Helvetica, Arial, sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 2px 1fr', alignItems: 'stretch', flex: '0 0 auto', margin: '0 -20px' }}>
+          <div style={{ fontSize: 'clamp(24px, 5vw, 32px)', fontFamily: 'Helvetica, Arial, sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px 0' }}>
             {formatTime(timeLeft)}
           </div>
           
@@ -575,14 +574,14 @@ if (screen === 'landing') {
             onClick={handleSubmit}
             disabled={screen === 'submitting'}
             style={{
-              backgroundColor: screen === 'submitting' ? 'transparent' : '#0066FF',
+              backgroundColor: screen === 'submitting' ? '#F5F5DC' : '#0066FF',
               color: screen === 'submitting' ? '#000' : '#fff',
               fontSize: 'clamp(16px, 3.5vw, 20px)',
               fontWeight: '500',
               border: 'none',
               cursor: screen === 'submitting' ? 'default' : 'pointer',
               fontFamily: 'Helvetica, Arial, sans-serif',
-              height: '100%'
+              padding: '20px 0'
             }}
           >
             {screen === 'submitting' ? '.'.repeat(submittingDots) : 'SUBMIT'}
