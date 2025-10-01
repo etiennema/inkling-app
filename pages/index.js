@@ -77,12 +77,8 @@ export default function Home() {
         if (error) throw error;
         uid = data.id;
         localStorage.setItem('inkling_user_id', uid);
-        
-        if (localStorage.getItem('inkling_seen_warning') !== 'true') {
-          setUserId(uid);
-          setScreen('first-time');
-          return;
-        }
+      }
+      
       } else {
         await supabase
           .from('users')
