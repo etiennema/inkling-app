@@ -197,25 +197,19 @@ export default function Home() {
 };
 
   const initCanvas = () => {
-  const canvas = canvasRef.current;
-  if (!canvas) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-  // Calculate available space
-  const availableWidth = window.innerWidth - 40; // 20px padding on each side
-  const availableHeight = window.innerHeight - 300; // Rough estimate for prompt, controls, buttons
-  
-  // Make canvas fit within both constraints, keeping it square
-  const size = Math.min(availableWidth, availableHeight, 600);
-  
-  canvas.width = size;
-  canvas.height = size;
+    const size = Math.min(window.innerWidth - 40, 600);
+    canvas.width = size;
+    canvas.height = size;
 
-  const ctx = canvas.getContext('2d');
-  ctx.fillStyle = '#F5F5DC';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
-};
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#F5F5DC';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+  };
 
   const startDrawing = (e) => {
     if (screen !== 'drawing') return;
