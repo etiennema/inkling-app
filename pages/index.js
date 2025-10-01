@@ -449,31 +449,30 @@ export default function Home() {
 
 if (screen === 'landing') {
     return (
-      <div style={{ minHeight: '100vh', backgroundColor: '#F5F5DC', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'Helvetica, Arial, sans-serif', overflow: 'hidden' }}>
-        <div style={{ maxWidth: '400px', width: '100%', textAlign: 'center' }}>
-          <h1 style={{ fontSize: 'clamp(50px, 12.5vw, 90px)', fontWeight: 'bold', margin: '0 0 16px 0', letterSpacing: '-2px' }}>INKLING</h1>
-          <p style={{ fontSize: 'clamp(11px, 2.5vw, 14px)', textTransform: 'uppercase', margin: '0 0 60px 0', letterSpacing: '1px' }}>TINY ACTS OF DRAWING</p>
-          <div style={{ marginBottom: '60px', fontSize: 'clamp(14px, 3.5vw, 18px)', lineHeight: '1.2' }}>
+      <div style={{ height: '100vh', backgroundColor: '#F5F5DC', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'Helvetica, Arial, sans-serif', overflow: 'hidden', boxSizing: 'border-box' }}>
+        <div style={{ maxWidth: '600px', width: '100%', textAlign: 'center' }}>
+          <h1 style={{ fontSize: 'clamp(75px, 18vw, 135px)', fontWeight: 'bold', margin: '0 0 24px 0', letterSpacing: '-2px' }}>INKLING</h1>
+          <p style={{ fontSize: 'clamp(16px, 3.5vw, 21px)', textTransform: 'uppercase', margin: '0 0 90px 0', letterSpacing: '1px' }}>TINY ACTS OF DRAWING</p>
+          <div style={{ marginBottom: '90px', fontSize: 'clamp(21px, 5vw, 27px)', lineHeight: '1.2' }}>
             <p style={{ margin: '0' }}>1 PROMPT</p>
             <p style={{ margin: '0' }}>1 MINUTE</p>
             <p style={{ margin: '0' }}>1 DRAWING</p>
-            <p style={{ margin: '32px 0 0 0', fontWeight: 'bold' }}>DAILY</p>
+            <p style={{ margin: '48px 0 0 0', fontWeight: 'bold' }}>DAILY</p>
           </div>
           <button
             onClick={handleStart}
             style={{
               backgroundColor: '#0066FF',
               color: '#fff',
-              padding: '16px 48px',
-              fontSize: 'clamp(14px, 3.5vw, 18px)',
+              padding: '24px 40px',
+              fontSize: 'clamp(21px, 5vw, 27px)',
               fontWeight: '500',
               border: 'none',
               borderRadius: '0',
               cursor: 'pointer',
               fontFamily: 'Helvetica, Arial, sans-serif',
               letterSpacing: '1px',
-              width: '100%',
-              maxWidth: '280px'
+              display: 'inline-block'
             }}
           >
             START
