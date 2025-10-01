@@ -175,14 +175,25 @@ export default function Home() {
   };
 
   const handleStart = () => {
-    if (screen === 'first-time') {
-      localStorage.setItem('inkling_seen_warning', 'true');
-    }
+  if (screen === 'first-time') {
+    localStorage.setItem('inkling_seen_warning', 'true');
     setScreen('drawing');
     setDrawingStartTime(Date.now());
     setTimeLeft(TIMER_DURATION);
     setTimeout(() => initCanvas(), 0);
-  };
+    return;
+  }
+  
+  if (localStorage.getItem('inkling_seen_warning') !== 'true') {
+    setScreen('first-time');
+    return;
+  }
+  
+  setScreen('drawing');
+  setDrawingStartTime(Date.now());
+  setTimeLeft(TIMER_DURATION);
+  setTimeout(() => initCanvas(), 0);
+};
 
   const initCanvas = () => {
     const canvas = canvasRef.current;
