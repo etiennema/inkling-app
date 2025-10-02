@@ -617,29 +617,32 @@ export default function Home() {
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 2px 1fr', alignItems: 'stretch', flexShrink: 0, margin: '0 -16px', paddingBottom: '16px' }}>
-          <div style={{ fontSize: 'clamp(20px, 4.5vw, 28px)', fontFamily: 'Helvetica, Arial, sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px 0' }}>
-            {formatTime(timeLeft)}
+        <div style={{ display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
+          <div style={{ height: '2px', backgroundColor: '#000', width: '100%' }}></div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 2px 1fr', alignItems: 'stretch' }}>
+            <div style={{ fontSize: 'clamp(20px, 4.5vw, 28px)', fontFamily: 'Helvetica, Arial, sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px 0' }}>
+              {formatTime(timeLeft)}
+            </div>
+            
+            <div style={{ backgroundColor: '#000', width: '2px' }}></div>
+          
+                      <button
+              onClick={handleSubmit}
+              disabled={screen === 'submitting'}
+              style={{
+                backgroundColor: screen === 'submitting' ? '#F5F5DC' : '#0066FF',
+                color: screen === 'submitting' ? '#000' : '#fff',
+                fontSize: 'clamp(14px, 3vw, 18px)',
+                fontWeight: '500',
+                border: 'none',
+                cursor: screen === 'submitting' ? 'default' : 'pointer',
+                fontFamily: 'Helvetica, Arial, sans-serif',
+                padding: '16px 0'
+              }}
+            >
+              {screen === 'submitting' ? '.'.repeat(submittingDots) : 'SUBMIT'}
+            </button>
           </div>
-          
-          <div style={{ backgroundColor: '#000', width: '2px' }}></div>
-          
-          <button
-            onClick={handleSubmit}
-            disabled={screen === 'submitting'}
-            style={{
-              backgroundColor: screen === 'submitting' ? '#F5F5DC' : '#0066FF',
-              color: screen === 'submitting' ? '#000' : '#fff',
-              fontSize: 'clamp(14px, 3vw, 18px)',
-              fontWeight: '500',
-              border: 'none',
-              cursor: screen === 'submitting' ? 'default' : 'pointer',
-              fontFamily: 'Helvetica, Arial, sans-serif',
-              padding: '16px 0'
-            }}
-          >
-            {screen === 'submitting' ? '.'.repeat(submittingDots) : 'SUBMIT'}
-          </button>
         </div>
       </div>
     );
@@ -724,7 +727,7 @@ export default function Home() {
           </h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px' }}>
             {gallery.map(item => (
-              <div key={item.id} style={{ aspectRatio: '1/1', backgroundColor: '#fff', border: '2px solid #000' }}>
+              <div key={item.id} style={{ aspectRatio: '1/1', backgroundColor: '#F5F5DC', border: '2px solid #000' }}>
                 <img src={item.image_url} alt="Drawing" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
             ))}
