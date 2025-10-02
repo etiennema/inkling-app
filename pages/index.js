@@ -528,32 +528,34 @@ if (screen === 'landing') {
 if (screen === 'drawing' || screen === 'submitting') {
   return (
     <div style={{ 
-      height: '100vh',
-      minHeight: '-webkit-fill-available',
+      height: '100dvh',
+      height: '-webkit-fill-available', // Safari fallback
       backgroundColor: '#F5F5DC', 
-      display: 'grid',
-      gridTemplateRows: 'auto 1fr auto',
+      display: 'flex', 
+      flexDirection: 'column',
+      overflow: 'hidden',
       fontFamily: 'Helvetica, Arial, sans-serif',
-      overflow: 'hidden'
+      boxSizing: 'border-box'
     }}>
       
       {/* Prompt */}
       <h2 style={{ 
-        fontSize: 'clamp(28px, 6vw, 42px)', // Bigger
+        fontSize: 'clamp(20px, 5vw, 28px)', 
         textAlign: 'center', 
-        margin: '12px 0',
+        margin: '8px 0', 
         fontWeight: 'bold',
         flexShrink: 0
       }}>
         "{todayPrompt}"
       </h2>
 
-      {/* Canvas wrapper */}
+      {/* Canvas wrapper (keeps square shape) */}
       <div style={{ 
+        flexGrow: 1, 
         display: 'flex', 
         alignItems: 'center', 
         justifyContent: 'center',
-        padding: '0 16px'
+        padding: '8px'
       }}>
         <canvas
           ref={canvasRef}
@@ -568,27 +570,28 @@ if (screen === 'drawing' || screen === 'submitting') {
             border: '2px solid #000',
             cursor: 'crosshair',
             touchAction: 'none',
-            aspectRatio: '1 / 1',
+            aspectRatio: '1 / 1', // forces square
             width: '100%',
-            height: '100%',
-            maxWidth: 'min(90vw, 90vh)',
-            maxHeight: 'min(90vw, 90vh)'
+            maxWidth: 'min(90vw, 90vh)', // fit square within viewport
+            height: 'auto'
           }}
         />
       </div>
 
-      {/* Bottom section (palette + controls) */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        
-        {/* Palette */}
+      {/* Palette */}
+      <div style={{ 
+        borderTop: '2px solid #000',
+        padding: '6px 0',
+        flexShrink: 0
+      }}>
         <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
           {COLORS.map(color => (
             <button
               key={color}
               onClick={() => setSelectedColor(color)}
               style={{
-                width: '36px',
-                height: '36px',
+                width: '32px',
+                height: '32px',
                 borderRadius: '50%',
                 border: selectedColor === color ? '3px solid #666' : '2px solid #000',
                 backgroundColor: color,
@@ -598,148 +601,49 @@ if (screen === 'drawing' || screen === 'submitting') {
             />
           ))}
         </div>
+      </div>
 
-        {/* Controls */}
+      {/* Bottom controls */}
+      <div style={{ 
+        borderTop: '2px solid #000',
+        display: 'grid',
+        gridTemplateColumns: '1fr 2px 1fr',
+        alignItems: 'stretch',
+        flexShrink: 0
+      }}>
         <div style={{ 
-          display: 'grid',
-          gridTemplateColumns: '1fr 2px 1fr',
-          alignItems: 'stretch'
+          fontSize: 'clamp(18px, 4vw, 24px)', 
+          fontFamily: 'monospace', // ensures timer font is correct
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          padding: '12px 0'
         }}>
-          <div style={{ 
-            fontSize: 'clamp(18px, 4vw, 24px)', 
-            fontFamily: 'Helvetica, Arial, sans-serif', // back to Helvetica
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center',
-            padding: '12px 0'
-          }}>
-            {formatTime(timeLeft)}
-          </div>
-          
-          <div style={{ backgroundColor: '#000', width: '2px' }}></div>
-          
-          <button
-            onClick={handleSubmit}
-            disabled={screen === 'submitting'}
-            style={{
-              backgroundColor: screen === 'submitting' ? '#F5F5DC' : '#0066FF',
-              color: screen === 'submitting' ? '#000' : '#fff',
-              fontSize: 'clamp(16px, 4vw, 20px)',
-              fontWeight: '500',
-              border: 'none',
-              cursor: screen === 'submitting' ? 'default' : 'pointer',
-              fontFamily: 'Helvetica, Arial, sans-serif',
-              padding: '12px 0'
-            }}
-          >
-            {screen === 'submitting' ? 'SUBMITTING...' : 'SUBMIT'}
-          </button>
+          {formatTime(timeLeft)}
         </div>
+        
+        <div style={{ backgroundColor: '#000', width: '2px' }}></div>
+        
+        <button
+          onClick={handleSubmit}
+          disabled={screen === 'submitting'}
+          style={{
+            backgroundColor: screen === 'submitting' ? '#F5F5DC' : '#0066FF',
+            color: screen === 'submitting' ? '#000' : '#fff',
+            fontSize: 'clamp(14px, 3vw, 18px)',
+            fontWeight: '500',
+            border: 'none',
+            cursor: screen === 'submitting' ? 'default' : 'pointer',
+            fontFamily: 'Helvetica, Arial, sans-serif',
+            padding: '12px 0'
+          }}
+        >
+          {screen === 'submitting' ? 'SUBMITTING...' : 'SUBMIT'}
+        </button>
       </div>
     </div>
   );
 }
-
-
-
-
-  if (screen === 'error-validation') {
-    return (
-      <div style={{ minHeight: '100vh', backgroundColor: '#F5F5DC', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'Helvetica, Arial, sans-serif' }}>
-        <div style={{ maxWidth: '400px', width: '100%' }}>
-          <div style={{ backgroundColor: '#000', color: '#fff', padding: '32px', marginBottom: '32px' }}>
-            <p style={{ fontSize: '14px', lineHeight: '1.6', margin: 0 }}>
-              {errorMessage === 'blank' && "OOPS. THERE'S NO BLANK CANVASES ALLOWED. YOU'RE ALMOST THERE!"}
-              {errorMessage === 'time' && "YOU CAN DO IT! KEEP GOING! FOLLOW ANY THEME."}
-              {errorMessage === 'network' && "OOF. PLEASE TRY AGAIN. IF YOU'RE HAVING AN ISSUE, PLEASE LET US KNOW."}
-            </p>
-          </div>
-          <button
-            onClick={handleRetry}
-            style={{
-              backgroundColor: '#0066FF',
-              color: '#fff',
-              padding: '12px 32px',
-              fontSize: '16px',
-              fontWeight: '500',
-              border: 'none',
-              cursor: 'pointer',
-              width: '100%',
-              fontFamily: 'Helvetica, Arial, sans-serif'
-            }}
-          >
-            BACK TO DRAWING
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (screen === 'congrats') {
-    return (
-      <div style={{ minHeight: '100vh', backgroundColor: '#F5F5DC', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'Helvetica, Arial, sans-serif' }}>
-        <div style={{ textAlign: 'center' }}>
-          <h2 style={{ fontSize: '36px', fontWeight: 'bold', marginBottom: '16px' }}>CONGRATS!</h2>
-          <p style={{ fontSize: '18px', lineHeight: '1.5' }}>
-            YOU'VE COMPLETED<br />
-            {submissionCount} DRAWING{submissionCount !== 1 ? 'S' : ''} SO FAR.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  if (screen === 'gallery') {
-    return (
-      <div style={{ minHeight: '100vh', backgroundColor: '#F5F5DC', padding: '20px', fontFamily: 'Helvetica, Arial, sans-serif' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-            <h2 style={{ fontSize: '32px', fontWeight: 'bold', margin: '0 0 8px 0' }}>GALLERY</h2>
-            <p style={{ fontSize: '14px', margin: 0 }}>
-              {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase()}
-            </p>
-          </div>
-
-          {gallery.length === 0 ? (
-            <div style={{ textAlign: 'center', maxWidth: '400px', margin: '0 auto' }}>
-              <p style={{ marginBottom: '16px' }}>YOU'RE FIRST TODAY!</p>
-              <p>COME BACK LATER TO SEE SOME OTHER CREATIONS.</p>
-            </div>
-          ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px' }}>
-              {gallery.map(item => (
-                <div key={item.id} style={{ border: '2px solid #000', padding: '8px', backgroundColor: '#fff', aspectRatio: '1' }}>
-                  <img 
-                    src={item.image_url} 
-                    alt="Drawing"
-                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                  />
-                </div>
-              ))}
-            </div>
-          )}
-
-          <div style={{ textAlign: 'center', marginTop: '32px' }}>
-            <button
-              onClick={() => setScreen('already-done')}
-              style={{
-                backgroundColor: '#0066FF',
-                color: '#fff',
-                padding: '8px 24px',
-                fontSize: '16px',
-                fontWeight: '500',
-                border: 'none',
-                cursor: 'pointer',
-                fontFamily: 'Helvetica, Arial, sans-serif'
-              }}
-            >
-              BACK
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   if (screen === 'already-done') {
     return (
