@@ -533,29 +533,31 @@ if (screen === 'drawing' || screen === 'submitting') {
       backgroundColor: '#F5F5DC', 
       display: 'flex', 
       flexDirection: 'column',
+      overflow: 'hidden',
       fontFamily: 'Helvetica, Arial, sans-serif',
-      overflow: 'hidden'
+      boxSizing: 'border-box'
     }}>
       
       {/* Prompt */}
       <h2 style={{ 
-        fontSize: 'clamp(24px, 5vw, 32px)', 
+        fontSize: 'clamp(20px, 5vw, 28px)', 
         textAlign: 'center', 
-        margin: '12px 0', 
+        margin: '8px 0', 
         fontWeight: 'bold',
-        flexShrink: 0 
+        flexShrink: 0,
+        border: '2px dashed red' // DEBUG
       }}>
         "{todayPrompt}"
       </h2>
 
-      {/* Canvas (flexible middle) */}
+      {/* Canvas wrapper (square) */}
       <div style={{ 
         flexGrow: 1, 
         display: 'flex', 
         alignItems: 'center', 
-        justifyContent: 'center', 
-        padding: '0 16px',
-        maxHeight: 'calc(100vh - 220px)' // reserve space for prompt + palette + controls
+        justifyContent: 'center',
+        border: '2px dashed green', // DEBUG
+        padding: '8px'
       }}>
         <canvas
           ref={canvasRef}
@@ -570,9 +572,8 @@ if (screen === 'drawing' || screen === 'submitting') {
             border: '2px solid #000',
             cursor: 'crosshair',
             touchAction: 'none',
-            width: '100%',
-            height: '100%',
-            maxWidth: '600px',
+            aspectRatio: '1 / 1', // FORCE SQUARE
+            maxWidth: '100%',
             maxHeight: '100%'
           }}
         />
@@ -580,9 +581,9 @@ if (screen === 'drawing' || screen === 'submitting') {
 
       {/* Palette */}
       <div style={{ 
-        borderTop: '2px solid #000',
-        padding: '8px 0',
-        flexShrink: 0 
+        border: '2px dashed blue', // DEBUG
+        padding: '6px 0',
+        flexShrink: 0
       }}>
         <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
           {COLORS.map(color => (
@@ -590,10 +591,10 @@ if (screen === 'drawing' || screen === 'submitting') {
               key={color}
               onClick={() => setSelectedColor(color)}
               style={{
-                width: '36px',
-                height: '36px',
+                width: '32px',
+                height: '32px',
                 borderRadius: '50%',
-                border: selectedColor === color ? '4.2px solid #666' : '2px solid #000',
+                border: selectedColor === color ? '3px solid #666' : '2px solid #000',
                 backgroundColor: color,
                 cursor: 'pointer',
                 padding: 0
@@ -605,15 +606,15 @@ if (screen === 'drawing' || screen === 'submitting') {
 
       {/* Bottom controls */}
       <div style={{ 
+        border: '2px dashed orange', // DEBUG
         display: 'grid',
         gridTemplateColumns: '1fr 2px 1fr',
         alignItems: 'stretch',
-        flexShrink: 0,
-        borderTop: '2px solid #000'
+        flexShrink: 0
       }}>
         <div style={{ 
           fontSize: 'clamp(18px, 4vw, 24px)', 
-          fontFamily: 'monospace', 
+          fontFamily: 'monospace', // FIX TIMER FONT
           display: 'flex', 
           alignItems: 'center', 
           justifyContent: 'center',
@@ -644,6 +645,7 @@ if (screen === 'drawing' || screen === 'submitting') {
     </div>
   );
 }
+
 
 
 
