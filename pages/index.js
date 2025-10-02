@@ -526,10 +526,10 @@ if (screen === 'landing') {
   }
 
 if (screen === 'drawing' || screen === 'submitting') {
-  // Calculate canvas size on mount/resize
+  // Dynamically resize the canvas so it’s always a square
   useEffect(() => {
     const resizeCanvas = () => {
-      const reservedSpace = 160; // rough px space for prompt + palette + controls
+      const reservedSpace = 200; // px space for prompt, palette, and controls
       const size = Math.min(window.innerWidth - 32, window.innerHeight - reservedSpace);
       const canvas = canvasRef.current;
       if (canvas) {
@@ -543,28 +543,31 @@ if (screen === 'drawing' || screen === 'submitting') {
   }, []);
 
   return (
-    <div style={{
-      height: '100dvh',
-      height: '-webkit-fill-available', // iOS Safari fallback
-      display: 'grid',
-      gridTemplateRows: 'auto 1fr auto auto',
-      backgroundColor: '#F5F5DC',
-      overflow: 'hidden',
-      fontFamily: 'Helvetica, Arial, sans-serif',
-      boxSizing: 'border-box'
-    }}>
-      
+    <div
+      style={{
+        height: '100dvh',
+        height: '-webkit-fill-available', // iOS Safari fix
+        display: 'grid',
+        gridTemplateRows: 'auto 1fr auto auto',
+        backgroundColor: '#F5F5DC',
+        overflow: 'hidden',
+        fontFamily: 'Helvetica, Arial, sans-serif',
+        boxSizing: 'border-box'
+      }}
+    >
       {/* Prompt */}
-      <h2 style={{
-        fontSize: 'clamp(28px, 6vw, 42px)', // larger headline
-        textAlign: 'center',
-        margin: '12px 0 8px 0',
-        fontWeight: 'bold'
-      }}>
+      <h2
+        style={{
+          fontSize: 'clamp(28px, 6vw, 42px)',
+          textAlign: 'center',
+          margin: '12px 0 8px 0',
+          fontWeight: 'bold'
+        }}
+      >
         "{todayPrompt}"
       </h2>
 
-      {/* Canvas container */}
+      {/* Canvas */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <canvas
           ref={canvasRef}
@@ -580,14 +583,14 @@ if (screen === 'drawing' || screen === 'submitting') {
             cursor: 'crosshair',
             touchAction: 'none',
             maxWidth: '100%',
-            height: 'auto',
-            aspectRatio: '1 / 1'
+            aspectRatio: '1 / 1',
+            height: 'auto'
           }}
         />
       </div>
 
-      {/* Palette (no divider above it) */}
-      <div style={{ padding: '6px 0' }}>
+      {/* Palette (no divider above) */}
+      <div style={{ padding: '8px 0' }}>
         <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
           {COLORS.map(color => (
             <button
@@ -607,46 +610,40 @@ if (screen === 'drawing' || screen === 'submitting') {
         </div>
       </div>
 
-      {/* Bottom controls (divider above) */}
-      <div style={{
-        borderTop: '2px solid #000',
-        display: 'grid',
-        gridTemplateColumns: '1fr 2px 1fr',
-        alignItems: 'stretch'
-      }}>
-        <div style={{
-          fontSize: 'clamp(18px, 4vw, 24px)',
-          fontFamily: 'Helvetica, Arial, sans-serif', // keep Helvetica
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '12px 0'
-        }}>
+      {/* Timer + Submit */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 2px 1fr',
+          alignItems: 'stretch',
+          margin: '0 -16px',
+          fontFamily: 'Helvetica, Arial, sans-serif'
+        }}
+      >
+        {/* Timer */}
+        <div
+          style={{
+            fontSize: 'clamp(20px, 4.5vw, 28px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px 0'
+          }}
+        >
           {formatTime(timeLeft)}
         </div>
 
+        {/* Divider */}
         <div style={{ backgroundColor: '#000', width: '2px' }}></div>
 
+        {/* Submit button */}
         <button
           onClick={handleSubmit}
           disabled={screen === 'submitting'}
           style={{
             backgroundColor: screen === 'submitting' ? '#F5F5DC' : '#0066FF',
-            color: screen === 'submitting' ? '#000' : '#fff',
-            fontSize: 'clamp(14px, 3vw, 18px)',
-            fontWeight: '500',
-            border: 'none',
-            cursor: screen === 'submitting' ? 'default' : 'pointer',
-            fontFamily: 'Helvetica, Arial, sans-serif',
-            padding: '12px 0'
-          }}
-        >
-          {screen === 'submitting' ? 'SUBMITTING...' : 'SUBMIT'}
-        </button>
-      </div>
-    </div>
-  );
-}
+            color: screen === 'submitting' ? '#000' : '#
+
 
 
 
