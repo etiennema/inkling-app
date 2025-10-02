@@ -540,22 +540,22 @@ if (screen === 'drawing' || screen === 'submitting') {
       
       {/* Prompt */}
       <h2 style={{ 
-        fontSize: 'clamp(20px, 5vw, 28px)', 
+        fontSize: 'clamp(28px, 6vw, 42px)', // bigger headline
         textAlign: 'center', 
-        margin: '8px 0', 
+        margin: '12px 0 8px 0', 
         fontWeight: 'bold',
         flexShrink: 0
       }}>
         "{todayPrompt}"
       </h2>
 
-      {/* Canvas wrapper (keeps square shape) */}
+      {/* Canvas wrapper (square, centered) */}
       <div style={{ 
         flexGrow: 1, 
         display: 'flex', 
         alignItems: 'center', 
         justifyContent: 'center',
-        padding: '8px'
+        padding: '0 16px'
       }}>
         <canvas
           ref={canvasRef}
@@ -570,9 +570,9 @@ if (screen === 'drawing' || screen === 'submitting') {
             border: '2px solid #000',
             cursor: 'crosshair',
             touchAction: 'none',
-            aspectRatio: '1 / 1', // forces square
+            aspectRatio: '1 / 1',
             width: '100%',
-            maxWidth: 'min(90vw, 90vh)', // fit square within viewport
+            maxWidth: 'min(90vw, 90vh)',
             height: 'auto'
           }}
         />
@@ -580,7 +580,6 @@ if (screen === 'drawing' || screen === 'submitting') {
 
       {/* Palette */}
       <div style={{ 
-        borderTop: '2px solid #000',
         padding: '6px 0',
         flexShrink: 0
       }}>
@@ -613,7 +612,7 @@ if (screen === 'drawing' || screen === 'submitting') {
       }}>
         <div style={{ 
           fontSize: 'clamp(18px, 4vw, 24px)', 
-          fontFamily: 'monospace', // ensures timer font is correct
+          fontFamily: 'Helvetica, Arial, sans-serif', // back to Helvetica
           display: 'flex', 
           alignItems: 'center', 
           justifyContent: 'center',
@@ -644,6 +643,7 @@ if (screen === 'drawing' || screen === 'submitting') {
     </div>
   );
 }
+
 
   if (screen === 'already-done') {
     return (
