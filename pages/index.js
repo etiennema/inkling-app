@@ -530,7 +530,7 @@ if (screen === 'landing') {
       <div style={{ height: '100vh', minHeight: '-webkit-fill-available', backgroundColor: '#F5F5DC', display: 'flex', flexDirection: 'column', padding: '16px 16px 0 16px', fontFamily: 'Helvetica, Arial, sans-serif', overflow: 'hidden', boxSizing: 'border-box', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}>
         <h2 style={{ fontSize: 'clamp(28px, 6vw, 40px)', textAlign: 'center', margin: '0 0 16px 0', fontWeight: 'bold', textTransform: 'uppercase', flexShrink: 0 }}>"{todayPrompt}"</h2>
         
-        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 0, marginBottom: '12px' }}>
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 0, maxHeight: 'calc(100vh - 220px)', marginBottom: '12px' }}>
           <canvas
             ref={canvasRef}
             onMouseDown={startDrawing}
