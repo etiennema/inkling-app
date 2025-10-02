@@ -525,31 +525,24 @@ if (screen === 'landing') {
     );
   }
 
-  if (screen === 'drawing' || screen === 'submitting') {
+if (screen === 'drawing' || screen === 'submitting') {
   return (
     <div style={{ 
-      height: '100vh', 
+      height: '100vh',
       minHeight: '-webkit-fill-available',
       backgroundColor: '#F5F5DC', 
       display: 'flex', 
-      flexDirection: 'column', 
-      padding: '16px', 
-      fontFamily: 'Helvetica, Arial, sans-serif', 
-      boxSizing: 'border-box', 
-      position: 'fixed', 
-      top: 0, 
-      left: 0, 
-      right: 0, 
-      bottom: 0 
+      flexDirection: 'column',
+      fontFamily: 'Helvetica, Arial, sans-serif',
+      overflow: 'hidden'
     }}>
       
       {/* Prompt */}
       <h2 style={{ 
-        fontSize: 'clamp(28px, 6vw, 40px)', 
+        fontSize: 'clamp(24px, 5vw, 32px)', 
         textAlign: 'center', 
-        margin: '0 0 16px 0', 
-        fontWeight: 'bold', 
-        textTransform: 'uppercase',
+        margin: '12px 0', 
+        fontWeight: 'bold',
         flexShrink: 0 
       }}>
         "{todayPrompt}"
@@ -557,11 +550,12 @@ if (screen === 'landing') {
 
       {/* Canvas (flexible middle) */}
       <div style={{ 
-        flex: 1, 
+        flexGrow: 1, 
         display: 'flex', 
         alignItems: 'center', 
         justifyContent: 'center', 
-        marginBottom: '12px' 
+        padding: '0 16px',
+        maxHeight: 'calc(100vh - 220px)' // reserve space for prompt + palette + controls
       }}>
         <canvas
           ref={canvasRef}
@@ -576,21 +570,18 @@ if (screen === 'landing') {
             border: '2px solid #000',
             cursor: 'crosshair',
             touchAction: 'none',
-            maxWidth: 'calc(100vw - 32px)',
-            maxHeight: '100%',
-            width: 'auto',
-            height: 'auto'
+            width: '100%',
+            height: '100%',
+            maxWidth: '600px',
+            maxHeight: '100%'
           }}
         />
       </div>
 
       {/* Palette */}
       <div style={{ 
-        borderBottom: '2px solid #000', 
-        paddingBottom: '12px', 
-        margin: '0 -16px', 
-        paddingLeft: '16px', 
-        paddingRight: '16px', 
+        borderTop: '2px solid #000',
+        padding: '8px 0',
         flexShrink: 0 
       }}>
         <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
@@ -605,8 +596,7 @@ if (screen === 'landing') {
                 border: selectedColor === color ? '4.2px solid #666' : '2px solid #000',
                 backgroundColor: color,
                 cursor: 'pointer',
-                padding: 0,
-                flexShrink: 0
+                padding: 0
               }}
             />
           ))}
@@ -615,19 +605,19 @@ if (screen === 'landing') {
 
       {/* Bottom controls */}
       <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: '1fr 2px 1fr', 
-        alignItems: 'stretch', 
-        flexShrink: 0, 
-        margin: '0 -16px' 
+        display: 'grid',
+        gridTemplateColumns: '1fr 2px 1fr',
+        alignItems: 'stretch',
+        flexShrink: 0,
+        borderTop: '2px solid #000'
       }}>
         <div style={{ 
-          fontSize: 'clamp(20px, 4.5vw, 28px)', 
-          fontFamily: 'Helvetica, Arial, sans-serif', 
+          fontSize: 'clamp(18px, 4vw, 24px)', 
+          fontFamily: 'monospace', 
           display: 'flex', 
           alignItems: 'center', 
-          justifyContent: 'center', 
-          padding: '16px 0' 
+          justifyContent: 'center',
+          padding: '12px 0'
         }}>
           {formatTime(timeLeft)}
         </div>
@@ -645,15 +635,16 @@ if (screen === 'landing') {
             border: 'none',
             cursor: screen === 'submitting' ? 'default' : 'pointer',
             fontFamily: 'Helvetica, Arial, sans-serif',
-            padding: '16px 0'
+            padding: '12px 0'
           }}
         >
-          {screen === 'submitting' ? '.'.repeat(submittingDots) : 'SUBMIT'}
+          {screen === 'submitting' ? 'SUBMITTING...' : 'SUBMIT'}
         </button>
       </div>
     </div>
   );
 }
+
 
 
   if (screen === 'error-validation') {
