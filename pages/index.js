@@ -526,11 +526,14 @@ if (screen === 'landing') {
   }
 
 if (screen === 'drawing' || screen === 'submitting') {
-  // Dynamically resize the canvas so it’s always a square
+  // Ensure canvas is always a square that fits in available space
   useEffect(() => {
     const resizeCanvas = () => {
-      const reservedSpace = 200; // px space for prompt, palette, and controls
-      const size = Math.min(window.innerWidth - 32, window.innerHeight - reservedSpace);
+      const reservedSpace = 200; // space for prompt + palette + controls
+      const size = Math.min(
+        window.innerWidth - 32,
+        window.innerHeight - reservedSpace
+      );
       const canvas = canvasRef.current;
       if (canvas) {
         canvas.width = size;
@@ -546,7 +549,7 @@ if (screen === 'drawing' || screen === 'submitting') {
     <div
       style={{
         height: '100dvh',
-        height: '-webkit-fill-available', // iOS Safari fix
+        height: '-webkit-fill-available', // iOS Safari fallback
         display: 'grid',
         gridTemplateRows: 'auto 1fr auto auto',
         backgroundColor: '#F5F5DC',
@@ -560,7 +563,7 @@ if (screen === 'drawing' || screen === 'submitting') {
         style={{
           fontSize: 'clamp(28px, 6vw, 42px)',
           textAlign: 'center',
-          margin: '12px 0 8px 0',
+          margin: '12px 0',
           fontWeight: 'bold'
         }}
       >
@@ -589,7 +592,7 @@ if (screen === 'drawing' || screen === 'submitting') {
         />
       </div>
 
-      {/* Palette (no divider above) */}
+      {/* Palette */}
       <div style={{ padding: '8px 0' }}>
         <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
           {COLORS.map(color => (
@@ -616,14 +619,13 @@ if (screen === 'drawing' || screen === 'submitting') {
           display: 'grid',
           gridTemplateColumns: '1fr 2px 1fr',
           alignItems: 'stretch',
-          margin: '0 -16px',
-          fontFamily: 'Helvetica, Arial, sans-serif'
+          margin: '0 -16px'
         }}
       >
-        {/* Timer */}
         <div
           style={{
             fontSize: 'clamp(20px, 4.5vw, 28px)',
+            fontFamily: 'Helvetica, Arial, sans-serif',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -633,17 +635,29 @@ if (screen === 'drawing' || screen === 'submitting') {
           {formatTime(timeLeft)}
         </div>
 
-        {/* Divider */}
         <div style={{ backgroundColor: '#000', width: '2px' }}></div>
 
-        {/* Submit button */}
         <button
           onClick={handleSubmit}
           disabled={screen === 'submitting'}
           style={{
             backgroundColor: screen === 'submitting' ? '#F5F5DC' : '#0066FF',
-            color: screen === 'submitting' ? '#000' : '#
-
+            color: screen === 'submitting' ? '#000' : '#fff',
+            fontFamily: 'Helvetica, Arial, sans-serif',
+            padding: '12px',
+            fontSize: '16px',
+            fontWeight: '500',
+            border: 'none',
+            cursor: screen === 'submitting' ? 'not-allowed' : 'pointer',
+            opacity: screen === 'submitting' ? 0.6 : 1
+          }}
+        >
+          {screen === 'submitting' ? 'SUBMITTING...' : 'SUBMIT'}
+        </button>
+      </div>
+    </div>
+  );
+}
 
 
 
