@@ -38,39 +38,62 @@ export default function Home() {
     initializeApp();
   }, []);
 
-  // Timer effect — must always be declared, but will only run when conditions match
-useEffect(() => {
-  if (screen === 'drawing' && timeLeft > 0) {
-    timerRef.current = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev <= 1) {
-          handleAutoSubmit();
-          return 0;
+  // Timer effect
+  useEffect(() => {
+    if (screen === 'drawing' && timeLeft > 0) {
+      timerRef.current = setInterval(() => {
+        setTimeLeft(prev => {
+          if (prev <= 1) {
+            handleAutoSubmit();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(timerRef.current);
+    }
+  }, [screen, timeLeft]);
+
+  // Countdown effect
+  useEffect(() => {
+    if (screen === 'already-done') {
+      const interval = setInterval(() => {
+        setCountdown(getTimeUntilMidnight());
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [screen]);
+
+  // Canvas resize effect
+  useEffect(() => {
+    if (screen === 'drawing' || screen === 'submitting') {
+      const resizeCanvas = () => {
+        const reservedSpace = 200;
+        const size = Math.min(
+          window.innerWidth - 32,
+          window.innerHeight - reservedSpace
+        );
+        const canvas = canvasRef.current;
+        if (canvas) {
+          canvas.width = size;
+          canvas.height = size;
         }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(timerRef.current);
-  }
-}, [screen, timeLeft]);
-
-
- // Countdown effect
-useEffect(() => {
-  if (screen === 'already-done') {
-    const interval = setInterval(() => {
-      setCountdown(getTimeUntilMidnight());
-    }, 1000);
-    return () => clearInterval(interval);
-  }
-}, [screen]);
-
+      };
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+      return () => window.removeEventListener('resize', resizeCanvas);
+    }
+  }, [screen]);
 
   const initializeApp = async () => {
     try {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      let uid = localStorage.getItem('inkling_user_id');
+      let uid = null;
+      
+      if (typeof window !== 'undefined') {
+        uid = localStorage.getItem('inkling_user_id');
+      }
       
       if (!uid) {
         const fingerprint = generateFingerprint();
@@ -82,8 +105,9 @@ useEffect(() => {
         
         if (error) throw error;
         uid = data.id;
-        localStorage.setItem('inkling_user_id', uid);
-
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('inkling_user_id', uid);
+        }
       } else {
         await supabase
           .from('users')
@@ -100,21 +124,22 @@ useEffect(() => {
   };
 
   const generateFingerprint = () => {
-  // Generate a proper random UUID v4
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    const r = Math.random() * 16 | 0;
-    const v = c === 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
-};
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      const r = Math.random() * 16 | 0;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  };
 
   const checkTodayStatus = async (uid, timezone) => {
     try {
-      const { data: userData } = await supabase
+      const { data: userData, error: userError } = await supabase
         .from('users')
         .select('created_at')
         .eq('id', uid)
         .single();
+
+      if (userError) throw userError;
 
       const userStartDate = new Date(userData.created_at);
       const now = new Date();
@@ -127,7 +152,7 @@ useEffect(() => {
         .from('prompts')
         .select('prompt_text')
         .eq('prompt_index', currentPromptIndex)
-        .single();
+        .maybeSingle();
 
       if (prompt) {
         setTodayPrompt(prompt.prompt_text);
@@ -138,13 +163,15 @@ useEffect(() => {
       const startOfToday = new Date();
       startOfToday.setHours(0, 0, 0, 0);
 
-      const { data: todaySubmission } = await supabase
+      const { data: submissions, error: submissionError } = await supabase
         .from('submissions')
-        .select('*')
+        .select('id, image_url, submitted_at')
         .eq('user_id', uid)
         .eq('prompt_index', currentPromptIndex)
         .gte('submitted_at', startOfToday.toISOString())
-        .maybeSingle();
+        .limit(1);
+
+      if (submissionError) throw submissionError;
 
       const { count } = await supabase
         .from('submissions')
@@ -153,7 +180,7 @@ useEffect(() => {
 
       setSubmissionCount(count || 0);
 
-      if (todaySubmission) {
+      if (submissions && submissions.length > 0) {
         await loadGallery(currentPromptIndex);
         setScreen('already-done');
       } else {
@@ -181,50 +208,49 @@ useEffect(() => {
   };
 
   const handleStart = () => {
-  if (screen === 'first-time') {
-    localStorage.setItem('inkling_seen_warning', 'true');
+    if (screen === 'first-time') {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('inkling_seen_warning', 'true');
+      }
+      setScreen('drawing');
+      setDrawingStartTime(Date.now());
+      setTimeLeft(TIMER_DURATION);
+      setTimeout(() => initCanvas(), 0);
+      return;
+    }
+    
+    if (typeof window !== 'undefined' && localStorage.getItem('inkling_seen_warning') !== 'true') {
+      setScreen('first-time');
+      return;
+    }
+    
     setScreen('drawing');
     setDrawingStartTime(Date.now());
     setTimeLeft(TIMER_DURATION);
     setTimeout(() => initCanvas(), 0);
-    return;
-  }
-  
-  if (localStorage.getItem('inkling_seen_warning') !== 'true') {
-    setScreen('first-time');
-    return;
-  }
-  
-  setScreen('drawing');
-  setDrawingStartTime(Date.now());
-  setTimeLeft(TIMER_DURATION);
-  setTimeout(() => initCanvas(), 0);
-};
+  };
 
   const initCanvas = () => {
-  const canvas = canvasRef.current;
-  if (!canvas) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-  // Get the canvas container's actual available height
-  const container = canvas.parentElement;
-  const containerHeight = container ? container.clientHeight : window.innerHeight - 320;
-  
-  // Calculate available dimensions
-  const availableWidth = window.innerWidth - 32;
-  const availableHeight = Math.max(containerHeight - 20, 200); // At least 200px, with 20px margin
-  
-  // Make canvas fit within both constraints, keeping it square
-  const size = Math.min(availableWidth, availableHeight, 600);
-  
-  canvas.width = size;
-  canvas.height = size;
+    const container = canvas.parentElement;
+    const containerHeight = container ? container.clientHeight : window.innerHeight - 320;
+    
+    const availableWidth = window.innerWidth - 32;
+    const availableHeight = Math.max(containerHeight - 20, 200);
+    
+    const size = Math.min(availableWidth, availableHeight, 600);
+    
+    canvas.width = size;
+    canvas.height = size;
 
-  const ctx = canvas.getContext('2d');
-  ctx.fillStyle = '#F5F5DC';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
-};
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#F5F5DC';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+  };
 
   const startDrawing = (e) => {
     if (screen !== 'drawing') return;
@@ -383,31 +409,26 @@ useEffect(() => {
 
       setSubmissionCount(prev => prev + 1);
       await loadGallery(promptIndex);
-      
-        setSubmissionCount(prev => prev + 1);
-        await loadGallery(promptIndex);
 
-        // Animate dots
-        const dotInterval = setInterval(() => {
-          setSubmittingDots(prev => prev === 3 ? 1 : prev + 1);
-        }, 300);
+      const dotInterval = setInterval(() => {
+        setSubmittingDots(prev => prev === 3 ? 1 : prev + 1);
+      }, 300);
 
-        // Wait 900ms then flash and transition
+      setTimeout(() => {
+        clearInterval(dotInterval);
+        document.body.style.transition = 'background-color 0.05s';
+        document.body.style.backgroundColor = '#FFFFFF';
+        
         setTimeout(() => {
-          clearInterval(dotInterval);
-          document.body.style.transition = 'background-color 0.05s';
-          document.body.style.backgroundColor = '#FFFFFF';
+          document.body.style.backgroundColor = '#F5F5DC';
+          setScreen('congrats');
           
           setTimeout(() => {
-            document.body.style.backgroundColor = '#F5F5DC';
-            setScreen('congrats');
-            
-            setTimeout(() => {
-              setScreen('gallery');
-              document.body.style.transition = '';
-            }, 2000);
-          }, 200);
-}, 900);
+            setScreen('gallery');
+            document.body.style.transition = '';
+          }, 2000);
+        }, 200);
+      }, 900);
 
     } catch (error) {
       console.error('Submit error:', error);
@@ -495,7 +516,7 @@ useEffect(() => {
     );
   }
 
-if (screen === 'landing') {
+  if (screen === 'landing') {
     return (
       <div style={{ height: '100vh', minHeight: '-webkit-fill-available', backgroundColor: '#F5F5DC', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'Helvetica, Arial, sans-serif', overflow: 'hidden', boxSizing: 'border-box', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}>
         <div style={{ maxWidth: '600px', width: '100%', textAlign: 'center' }}>
@@ -530,93 +551,71 @@ if (screen === 'landing') {
     );
   }
 
-if (screen === 'drawing' || screen === 'submitting') {
-  // Ensure canvas is always a square that fits in available space
-  useEffect(() => {
-    const resizeCanvas = () => {
-      const reservedSpace = 200; // space for prompt + palette + controls
-      const size = Math.min(
-        window.innerWidth - 32,
-        window.innerHeight - reservedSpace
-      );
-      const canvas = canvasRef.current;
-      if (canvas) {
-        canvas.width = size;
-        canvas.height = size;
-      }
-    };
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-    return () => window.removeEventListener('resize', resizeCanvas);
-  }, []);
-
-  return (
-    <div
-      style={{
-        height: '100dvh',
-        height: '-webkit-fill-available', // iOS Safari fallback
-        display: 'grid',
-        gridTemplateRows: 'auto 1fr auto auto',
-        backgroundColor: '#F5F5DC',
-        overflow: 'hidden',
-        fontFamily: 'Helvetica, Arial, sans-serif',
-        boxSizing: 'border-box'
-      }}
-    >
-      {/* Prompt */}
-      <h2
+  if (screen === 'drawing' || screen === 'submitting') {
+    return (
+      <div
         style={{
-          fontSize: 'clamp(28px, 6vw, 42px)',
-          textAlign: 'center',
-          margin: '12px 0',
-          fontWeight: 'bold'
+          height: '100dvh',
+          minHeight: '-webkit-fill-available',
+          display: 'grid',
+          gridTemplateRows: 'auto 1fr auto auto',
+          backgroundColor: '#F5F5DC',
+          overflow: 'hidden',
+          fontFamily: 'Helvetica, Arial, sans-serif',
+          boxSizing: 'border-box'
         }}
       >
-        "{todayPrompt}"
-      </h2>
-
-      {/* Canvas */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <canvas
-          ref={canvasRef}
-          onMouseDown={startDrawing}
-          onMouseMove={draw}
-          onMouseUp={endDrawing}
-          onMouseLeave={endDrawing}
-          onTouchStart={startDrawing}
-          onTouchMove={draw}
-          onTouchEnd={endDrawing}
+        <h2
           style={{
-            border: '2px solid #000',
-            cursor: 'crosshair',
-            touchAction: 'none',
-            maxWidth: '100%',
-            aspectRatio: '1 / 1',
-            height: 'auto'
+            fontSize: 'clamp(28px, 6vw, 42px)',
+            textAlign: 'center',
+            margin: '12px 0',
+            fontWeight: 'bold'
           }}
-        />
-      </div>
+        >
+          "{todayPrompt}"
+        </h2>
 
-      {/* Palette */}
-      <div style={{ padding: '8px 0' }}>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
-          {COLORS.map(color => (
-            <button
-              key={color}
-              onClick={() => setSelectedColor(color)}
-              style={{
-                width: '32px',
-                height: '32px',
-                borderRadius: '50%',
-                border: selectedColor === color ? '3px solid #666' : '2px solid #000',
-                backgroundColor: color,
-                cursor: 'pointer',
-                padding: 0
-              }}
-            />
-          ))}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <canvas
+            ref={canvasRef}
+            onMouseDown={startDrawing}
+            onMouseMove={draw}
+            onMouseUp={endDrawing}
+            onMouseLeave={endDrawing}
+            onTouchStart={startDrawing}
+            onTouchMove={draw}
+            onTouchEnd={endDrawing}
+            style={{
+              border: '2px solid #000',
+              cursor: 'crosshair',
+              touchAction: 'none',
+              maxWidth: '100%',
+              aspectRatio: '1 / 1',
+              height: 'auto'
+            }}
+          />
         </div>
-      </div>
+
+        <div style={{ padding: '8px 0' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
+            {COLORS.map(color => (
+              <button
+                key={color}
+                onClick={() => setSelectedColor(color)}
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  border: selectedColor === color ? '3px solid #666' : '2px solid #000',
+                  backgroundColor: color,
+                  cursor: 'pointer',
+                  padding: 0
+                }}
+              />
+            ))}
+          </div>
+        </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 2px 1fr', alignItems: 'stretch', flexShrink: 0, margin: '0 -16px', paddingBottom: '16px' }}>
           <div style={{ fontSize: 'clamp(20px, 4.5vw, 28px)', fontFamily: 'Helvetica, Arial, sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px 0' }}>
@@ -678,7 +677,16 @@ if (screen === 'drawing' || screen === 'submitting') {
     );
   }
 
-
+  if (screen === 'congrats') {
+    return (
+      <div style={{ minHeight: '100vh', backgroundColor: '#F5F5DC', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'Helvetica, Arial, sans-serif' }}>
+        <div style={{ textAlign: 'center' }}>
+          <p style={{ fontSize: '24px', fontWeight: 'bold' }}>CONGRATS!</p>
+          <p style={{ fontSize: '18px' }}>YOU'VE COMPLETED {submissionCount} DRAWING{submissionCount !== 1 ? 'S' : ''} SO FAR</p>
+        </div>
+      </div>
+    );
+  }
 
   if (screen === 'already-done') {
     return (
@@ -707,7 +715,24 @@ if (screen === 'drawing' || screen === 'submitting') {
     );
   }
 
-  return null;
+  if (screen === 'gallery') {
+    return (
+      <div style={{ minHeight: '100vh', backgroundColor: '#F5F5DC', padding: '20px', fontFamily: 'Helvetica, Arial, sans-serif' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <h2 style={{ fontSize: '24px', textAlign: 'center', marginBottom: '32px' }}>
+            "{todayPrompt}"
+          </h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px' }}>
+            {gallery.map(item => (
+              <div key={item.id} style={{ aspectRatio: '1/1', backgroundColor: '#fff', border: '2px solid #000' }}>
+                <img src={item.image_url} alt="Drawing" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-  
+  return null;
 }
