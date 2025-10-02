@@ -38,29 +38,34 @@ export default function Home() {
     initializeApp();
   }, []);
 
-  useEffect(() => {
-    if (screen === 'drawing' && timeLeft > 0) {
-      timerRef.current = setInterval(() => {
-        setTimeLeft(prev => {
-          if (prev <= 1) {
-            handleAutoSubmit();
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-      return () => clearInterval(timerRef.current);
-    }
-  }, [screen, timeLeft]);
+  // Timer effect — must always be declared, but will only run when conditions match
+useEffect(() => {
+  if (screen === 'drawing' && timeLeft > 0) {
+    timerRef.current = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          handleAutoSubmit();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
 
-  useEffect(() => {
-    if (screen === 'already-done') {
-      const interval = setInterval(() => {
-        setCountdown(getTimeUntilMidnight());
-      }, 1000);
-      return () => clearInterval(interval);
-    }
-  }, [screen]);
+    return () => clearInterval(timerRef.current);
+  }
+}, [screen, timeLeft]);
+
+
+ // Countdown effect
+useEffect(() => {
+  if (screen === 'already-done') {
+    const interval = setInterval(() => {
+      setCountdown(getTimeUntilMidnight());
+    }, 1000);
+    return () => clearInterval(interval);
+  }
+}, [screen]);
+
 
   const initializeApp = async () => {
     try {
@@ -139,7 +144,7 @@ export default function Home() {
         .eq('user_id', uid)
         .eq('prompt_index', currentPromptIndex)
         .gte('submitted_at', startOfToday.toISOString())
-        .single();
+        .maybeSingle();
 
       const { count } = await supabase
         .from('submissions')
