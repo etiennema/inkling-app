@@ -526,37 +526,46 @@ if (screen === 'landing') {
   }
 
 if (screen === 'drawing' || screen === 'submitting') {
+  // Calculate canvas size on mount/resize
+  useEffect(() => {
+    const resizeCanvas = () => {
+      const reservedSpace = 160; // rough px space for prompt + palette + controls
+      const size = Math.min(window.innerWidth - 32, window.innerHeight - reservedSpace);
+      const canvas = canvasRef.current;
+      if (canvas) {
+        canvas.width = size;
+        canvas.height = size;
+      }
+    };
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+    return () => window.removeEventListener('resize', resizeCanvas);
+  }, []);
+
   return (
-    <div style={{ 
+    <div style={{
       height: '100dvh',
-      height: '-webkit-fill-available', // Safari fallback
-      backgroundColor: '#F5F5DC', 
-      display: 'flex', 
-      flexDirection: 'column',
+      height: '-webkit-fill-available', // iOS Safari fallback
+      display: 'grid',
+      gridTemplateRows: 'auto 1fr auto auto',
+      backgroundColor: '#F5F5DC',
       overflow: 'hidden',
       fontFamily: 'Helvetica, Arial, sans-serif',
       boxSizing: 'border-box'
     }}>
       
       {/* Prompt */}
-      <h2 style={{ 
-        fontSize: 'clamp(28px, 6vw, 42px)', // bigger headline
-        textAlign: 'center', 
-        margin: '12px 0 8px 0', 
-        fontWeight: 'bold',
-        flexShrink: 0
+      <h2 style={{
+        fontSize: 'clamp(28px, 6vw, 42px)', // larger headline
+        textAlign: 'center',
+        margin: '12px 0 8px 0',
+        fontWeight: 'bold'
       }}>
         "{todayPrompt}"
       </h2>
 
-      {/* Canvas wrapper (square, centered) */}
-      <div style={{ 
-        flexGrow: 1, 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center',
-        padding: '0 16px'
-      }}>
+      {/* Canvas container */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <canvas
           ref={canvasRef}
           onMouseDown={startDrawing}
@@ -570,19 +579,15 @@ if (screen === 'drawing' || screen === 'submitting') {
             border: '2px solid #000',
             cursor: 'crosshair',
             touchAction: 'none',
-            aspectRatio: '1 / 1',
-            width: '100%',
-            maxWidth: 'min(90vw, 90vh)',
-            height: 'auto'
+            maxWidth: '100%',
+            height: 'auto',
+            aspectRatio: '1 / 1'
           }}
         />
       </div>
 
-      {/* Palette */}
-      <div style={{ 
-        padding: '6px 0',
-        flexShrink: 0
-      }}>
+      {/* Palette (no divider above it) */}
+      <div style={{ padding: '6px 0' }}>
         <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
           {COLORS.map(color => (
             <button
@@ -602,27 +607,26 @@ if (screen === 'drawing' || screen === 'submitting') {
         </div>
       </div>
 
-      {/* Bottom controls */}
-      <div style={{ 
+      {/* Bottom controls (divider above) */}
+      <div style={{
         borderTop: '2px solid #000',
         display: 'grid',
         gridTemplateColumns: '1fr 2px 1fr',
-        alignItems: 'stretch',
-        flexShrink: 0
+        alignItems: 'stretch'
       }}>
-        <div style={{ 
-          fontSize: 'clamp(18px, 4vw, 24px)', 
-          fontFamily: 'Helvetica, Arial, sans-serif', // back to Helvetica
-          display: 'flex', 
-          alignItems: 'center', 
+        <div style={{
+          fontSize: 'clamp(18px, 4vw, 24px)',
+          fontFamily: 'Helvetica, Arial, sans-serif', // keep Helvetica
+          display: 'flex',
+          alignItems: 'center',
           justifyContent: 'center',
           padding: '12px 0'
         }}>
           {formatTime(timeLeft)}
         </div>
-        
+
         <div style={{ backgroundColor: '#000', width: '2px' }}></div>
-        
+
         <button
           onClick={handleSubmit}
           disabled={screen === 'submitting'}
@@ -643,6 +647,7 @@ if (screen === 'drawing' || screen === 'submitting') {
     </div>
   );
 }
+
 
 
   if (screen === 'already-done') {
