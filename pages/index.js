@@ -618,51 +618,65 @@ if (screen === 'drawing' || screen === 'submitting') {
         </div>
       </div>
 
-      {/* Timer + Submit */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 2px 1fr',
-          alignItems: 'stretch',
-          margin: '0 -16px'
-        }}
-      >
-        <div
-          style={{
-            fontSize: 'clamp(20px, 4.5vw, 28px)',
-            fontFamily: 'Helvetica, Arial, sans-serif',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '16px 0'
-          }}
-        >
-          {formatTime(timeLeft)}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 2px 1fr', alignItems: 'stretch', flexShrink: 0, margin: '0 -16px', paddingBottom: '16px' }}>
+          <div style={{ fontSize: 'clamp(20px, 4.5vw, 28px)', fontFamily: 'Helvetica, Arial, sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px 0' }}>
+            {formatTime(timeLeft)}
+          </div>
+          
+          <div style={{ backgroundColor: '#000', width: '2px' }}></div>
+          
+          <button
+            onClick={handleSubmit}
+            disabled={screen === 'submitting'}
+            style={{
+              backgroundColor: screen === 'submitting' ? '#F5F5DC' : '#0066FF',
+              color: screen === 'submitting' ? '#000' : '#fff',
+              fontSize: 'clamp(14px, 3vw, 18px)',
+              fontWeight: '500',
+              border: 'none',
+              cursor: screen === 'submitting' ? 'default' : 'pointer',
+              fontFamily: 'Helvetica, Arial, sans-serif',
+              padding: '16px 0'
+            }}
+          >
+            {screen === 'submitting' ? '.'.repeat(submittingDots) : 'SUBMIT'}
+          </button>
         </div>
-
-        <div style={{ backgroundColor: '#000', width: '2px' }}></div>
-
-        <button
-          onClick={handleSubmit}
-          disabled={screen === 'submitting'}
-          style={{
-            backgroundColor: screen === 'submitting' ? '#F5F5DC' : '#0066FF',
-            color: screen === 'submitting' ? '#000' : '#fff',
-            fontFamily: 'Helvetica, Arial, sans-serif',
-            padding: '12px',
-            fontSize: '16px',
-            fontWeight: '500',
-            border: 'none',
-            cursor: screen === 'submitting' ? 'not-allowed' : 'pointer',
-            opacity: screen === 'submitting' ? 0.6 : 1
-          }}
-        >
-          {screen === 'submitting' ? 'SUBMITTING...' : 'SUBMIT'}
-        </button>
       </div>
-    </div>
-  );
-}
+    );
+  }
+
+  if (screen === 'error-validation') {
+    return (
+      <div style={{ minHeight: '100vh', backgroundColor: '#F5F5DC', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'Helvetica, Arial, sans-serif' }}>
+        <div style={{ maxWidth: '400px', width: '100%' }}>
+          <div style={{ backgroundColor: '#000', color: '#fff', padding: '32px', marginBottom: '32px' }}>
+            <p style={{ fontSize: '14px', lineHeight: '1.6', margin: 0 }}>
+              {errorMessage === 'blank' && "OOPS. THERE'S NO BLANK CANVASES ALLOWED. YOU'RE ALMOST THERE!"}
+              {errorMessage === 'time' && "YOU CAN DO IT! KEEP GOING! FOLLOW ANY THEME."}
+              {errorMessage === 'network' && "OOF. PLEASE TRY AGAIN. IF YOU'RE HAVING AN ISSUE, PLEASE LET US KNOW."}
+            </p>
+          </div>
+          <button
+            onClick={handleRetry}
+            style={{
+              backgroundColor: '#0066FF',
+              color: '#fff',
+              padding: '12px 32px',
+              fontSize: '16px',
+              fontWeight: '500',
+              border: 'none',
+              cursor: 'pointer',
+              width: '100%',
+              fontFamily: 'Helvetica, Arial, sans-serif'
+            }}
+          >
+            BACK TO DRAWING
+          </button>
+        </div>
+      </div>
+    );
+  }
 
 
 
