@@ -573,7 +573,10 @@ if (screen === 'landing') {
           </div>
         </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 2px 1fr', alignItems: 'stretch', flexShrink: 0, margin: '0 -16px' }}> 
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 2px 1fr', alignItems: 'stretch', flexShrink: 0, margin: '0 -16px' }}>
+          <div style={{ fontSize: 'clamp(20px, 4.5vw, 28px)', fontFamily: 'Helvetica, Arial, sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px 0' }}>
+            {formatTime(timeLeft)}
+          </div>
           
           <div style={{ backgroundColor: '#000', width: '2px' }}></div>
           
