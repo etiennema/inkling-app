@@ -366,9 +366,12 @@ export default function Home() {
   };
 
   const handleAutoSubmit = async () => {
-    const coverage = calculateCoverage();
-    const drawingTime = firstStrokeTime ? (Date.now() - firstStrokeTime) / 1000 : 0;
-
+  console.log('Auto-submit triggered');
+  const coverage = calculateCoverage();
+  console.log('Coverage:', coverage, 'MIN_COVERAGE:', MIN_COVERAGE);
+  const drawingTime = firstStrokeTime ? (Date.now() - firstStrokeTime) / 1000 : 0;
+  console.log('Drawing time:', drawingTime);
+  
     if (coverage < MIN_COVERAGE) {
       setErrorMessage('blank');
       setScreen('error-validation');
