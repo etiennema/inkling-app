@@ -575,7 +575,7 @@ export default function Home() {
       >
         <h1
           style={{
-            fontSize: 'clamp(28px, 6vw, 42px)',
+            fontSize: 'clamp(28px, 10vw, 55px)',
             textAlign: 'center',
             margin: '12px 0',
             fontWeight: 'bold'
@@ -584,7 +584,7 @@ export default function Home() {
           "{todayPrompt}"
         </h1>
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
           <canvas
             ref={canvasRef}
             onMouseDown={startDrawing}
@@ -603,10 +603,8 @@ export default function Home() {
               height: 'auto'
             }}
           />
-        </div>
-
-          <div style={{ padding: '8px 0' }}>
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
+          
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
             {COLORS.map(color => (
               <button
                 key={color}
