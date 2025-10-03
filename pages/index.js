@@ -584,7 +584,7 @@ export default function Home() {
           "{todayPrompt}"
         </h1>
 
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, paddingTop: '16px' }}>
           <canvas
             ref={canvasRef}
             onMouseDown={startDrawing}
@@ -603,20 +603,23 @@ export default function Home() {
               height: 'auto'
             }}
           />
+
+          <div style={{ flex: 1 }}></div>
           
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-evenly', gap: '0', width: '100%', padding: '0 16px' }}>
             {COLORS.map(color => (
               <button
                 key={color}
                 onClick={() => setSelectedColor(color)}
                 style={{
-                  width: '32px',
-                  height: '32px',
+                  width: '48px',
+                  height: '48px',
                   borderRadius: '50%',
-                  border: selectedColor === color ? '3px solid #666' : '2px solid #000',
+                  border: selectedColor === color ? '6px solid #666' : '2px solid #000',
                   backgroundColor: color,
                   cursor: 'pointer',
-                  padding: 0
+                  padding: 0,
+                  flexShrink: 0
                 }}
               />
             ))}
