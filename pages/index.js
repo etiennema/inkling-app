@@ -551,7 +551,15 @@ export default function Home() {
     );
   }
 
-  if (screen === 'drawing' || screen === 'submitting') {
+  if (screen === 'submitting') {
+    return (
+      <div style={{ minHeight: '100vh', backgroundColor: '#F5F5DC', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Helvetica, Arial, sans-serif' }}>
+        <div style={{ textAlign: 'center', fontSize: '48px' }}>{'.'.repeat(submittingDots)}</div>
+      </div>
+    );
+  }
+
+  if (screen === 'drawing') {
     return (
       <div
         style={{
@@ -597,7 +605,7 @@ export default function Home() {
           />
         </div>
 
-        <div style={{ padding: '8px 0' }}>
+        <div style={{ padding: '8px 0', marginTop: 'auto' }}>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
             {COLORS.map(color => (
               <button
