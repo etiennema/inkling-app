@@ -39,21 +39,27 @@ export default function Home() {
   }, []);
 
   // Timer effect
-  useEffect(() => {
-    if (screen === 'drawing' && timeLeft > 0) {
-      timerRef.current = setInterval(() => {
-        setTimeLeft(prev => {
-          if (prev <= 1) {
-            handleAutoSubmit();
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
+    useEffect(() => {
+      if (screen === 'drawing' && timeLeft > 0) {
+        timerRef.current = setInterval(() => {
+          setTimeLeft(prev => {
+            if (prev <= 1) {
+              handleAutoSubmit();
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
 
-      return () => clearInterval(timerRef.current);
-    }
-  }, [screen, timeLeft]);
+        return () => {
+          if (timerRef.current) {
+            clearInterval(timerRef.current);
+          }
+        };
+      } else if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    }, [screen, timeLeft]);
 
   // Countdown effect
   useEffect(() => {
@@ -561,30 +567,32 @@ export default function Home() {
 
   if (screen === 'drawing') {
     return (
-    <div
-            style={{
-              height: '100dvh',
-              minHeight: '-webkit-fill-available',
-              display: 'flex',
-              flexDirection: 'column',
-              backgroundColor: '#F5F5DC',
-              overflow: 'hidden',
-              fontFamily: 'Helvetica, Arial, sans-serif',
-              boxSizing: 'border-box'
-            }}
-          >
-        <h1
+      <div
+        style={{
+          height: '100dvh',
+          minHeight: '-webkit-fill-available',
+          display: 'flex',
+          flexDirection: 'column',
+          backgroundColor: '#F5F5DC',
+          overflow: 'hidden',
+          fontFamily: 'Helvetica, Arial, sans-serif',
+          boxSizing: 'border-box',
+          padding: '0'
+        }}
+      >
+        <h2
           style={{
-            fontSize: 'clamp(28px, 10vw, 75px)',
+            fontSize: 'clamp(28px, 6vw, 42px)',
             textAlign: 'center',
             margin: '12px 0',
-            fontWeight: 'bold'
+            fontWeight: 'bold',
+            flexShrink: 0
           }}
         >
           "{todayPrompt}"
-        </h1>
+        </h2>
 
-  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, minHeight: 0 }}>
           <canvas
             ref={canvasRef}
             onMouseDown={startDrawing}
@@ -598,21 +606,23 @@ export default function Home() {
               border: '2px solid #000',
               cursor: 'crosshair',
               touchAction: 'none',
-              maxWidth: '100%',
+              maxWidth: 'calc(100% - 32px)',
+              maxHeight: '100%',
               aspectRatio: '1 / 1',
+              width: 'auto',
               height: 'auto'
             }}
           />
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-evenly', width: '100%', padding: '0 8px', flexShrink: 0 }}>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '16px', padding: '16px', flexShrink: 0 }}>
           {COLORS.map(color => (
             <button
               key={color}
               onClick={() => setSelectedColor(color)}
               style={{
-                width: '64px',
-                height: '64px',
+                width: '56px',
+                height: '56px',
                 borderRadius: '50%',
                 border: selectedColor === color ? '6px solid #666' : '2px solid #000',
                 backgroundColor: color,
@@ -637,17 +647,17 @@ export default function Home() {
               onClick={handleSubmit}
               disabled={screen === 'submitting'}
               style={{
-                backgroundColor: screen === 'submitting' ? '#F5F5DC' : '#0066FF',
-                color: screen === 'submitting' ? '#000' : '#fff',
+                backgroundColor: '#0066FF',
+                color: '#fff',
                 fontSize: 'clamp(14px, 3vw, 18px)',
                 fontWeight: '500',
                 border: 'none',
-                cursor: screen === 'submitting' ? 'default' : 'pointer',
+                cursor: 'pointer',
                 fontFamily: 'Helvetica, Arial, sans-serif',
                 padding: '16px 0'
               }}
             >
-              {screen === 'submitting' ? '.'.repeat(submittingDots) : 'SUBMIT'}
+              SUBMIT
             </button>
           </div>
         </div>
