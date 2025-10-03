@@ -371,7 +371,7 @@ export default function Home() {
   console.log('Coverage:', coverage, 'MIN_COVERAGE:', MIN_COVERAGE);
   const drawingTime = firstStrokeTime ? (Date.now() - firstStrokeTime) / 1000 : 0;
   console.log('Drawing time:', drawingTime);
-  
+
     if (coverage < MIN_COVERAGE) {
       setErrorMessage('blank');
       setScreen('error-validation');
@@ -585,7 +585,7 @@ export default function Home() {
       >
         <h2
           style={{
-            fontSize: 'clamp(28px, 6vw, 42px)',
+            fontSize: 'clamp(28px, 6vw, 72px)',
             textAlign: 'center',
             margin: '12px 0',
             fontWeight: 'bold',
@@ -595,7 +595,7 @@ export default function Home() {
           "{todayPrompt}"
         </h2>
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, minHeight: 0 }}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, minHeight: 0 }}>
           <canvas
             ref={canvasRef}
             onMouseDown={startDrawing}
@@ -618,7 +618,9 @@ export default function Home() {
           />
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '16px', padding: '16px', flexShrink: 0 }}>
+        <div style={{ flex: '0.25' }}></div>
+        
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '16px', padding: '0 16px', flexShrink: 0 }}>
           {COLORS.map(color => (
             <button
               key={color}
@@ -636,6 +638,8 @@ export default function Home() {
             />
           ))}
         </div>
+
+        <div style={{ flex: '0.75' }}></div>
 
         <div style={{ display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
           <div style={{ height: '2px', backgroundColor: '#000', width: '100%' }}></div>
