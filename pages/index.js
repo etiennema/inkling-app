@@ -568,7 +568,7 @@ export default function Home() {
     );
   }
 
-  if (screen === 'drawing') {
+ if (screen === 'drawing') {
     return (
       <div
         style={{
@@ -580,26 +580,26 @@ export default function Home() {
           overflow: 'hidden',
           fontFamily: 'Helvetica, Arial, sans-serif',
           boxSizing: 'border-box',
-          padding: '0',
-          position: 'relative'
+          padding: '0'
         }}
       >
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, display: 'flex', alignItems: 'center', height: '50%', pointerEvents: 'none' }}>
-          <h2
-            style={{
-              fontSize: 'clamp(28px, 6vw, 42px)',
-              textAlign: 'center',
-              margin: 'auto 0 0 0',
-              fontWeight: 'bold',
-              width: '100%',
-              pointerEvents: 'auto'
-            }}
-          >
-            "{todayPrompt}"
-          </h2>
-        </div>
+        <div style={{ flex: '1', minHeight: 0 }}></div>
+        
+        <h2
+          style={{
+            fontSize: 'clamp(28px, 6vw, 42px)',
+            textAlign: 'center',
+            margin: '12px 0',
+            fontWeight: 'bold',
+            flexShrink: 0
+          }}
+        >
+          "{todayPrompt}"
+        </h2>
 
-        <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', maxWidth: 'calc(100% - 32px)', maxHeight: 'calc(100vh - 200px)' }}>
+        <div style={{ flex: '1', minHeight: 0 }}></div>
+
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, padding: '0 16px' }}>
           <canvas
             ref={canvasRef}
             onMouseDown={startDrawing}
@@ -613,66 +613,63 @@ export default function Home() {
               border: '2px solid #000',
               cursor: 'crosshair',
               touchAction: 'none',
+              maxWidth: '100%',
+              maxHeight: '60vh',
               aspectRatio: '1 / 1',
               width: 'auto',
-              height: 'auto',
-              maxWidth: '100%',
-              maxHeight: '100%',
-              display: 'block'
+              height: 'auto'
             }}
           />
         </div>
 
-        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, display: 'flex', flexDirection: 'column', height: '50%', pointerEvents: 'none' }}>
-          <div style={{ flex: '0.125' }}></div>
-          
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '16px', padding: '0 16px', flexShrink: 0, pointerEvents: 'auto' }}>
-            {COLORS.map(color => (
-              <button
-                key={color}
-                onClick={() => setSelectedColor(color)}
-                style={{
-                  width: '56px',
-                  height: '56px',
-                  borderRadius: '50%',
-                  border: selectedColor === color ? '6px solid #666' : '2px solid #000',
-                  backgroundColor: color,
-                  cursor: 'pointer',
-                  padding: 0,
-                  flexShrink: 0
-                }}
-              />
-            ))}
-          </div>
+        <div style={{ flex: '0.5', minHeight: 0 }}></div>
+        
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '16px', padding: '0 16px', flexShrink: 0 }}>
+          {COLORS.map(color => (
+            <button
+              key={color}
+              onClick={() => setSelectedColor(color)}
+              style={{
+                width: '56px',
+                height: '56px',
+                borderRadius: '50%',
+                border: selectedColor === color ? '6px solid #666' : '2px solid #000',
+                backgroundColor: color,
+                cursor: 'pointer',
+                padding: 0,
+                flexShrink: 0
+              }}
+            />
+          ))}
+        </div>
 
-          <div style={{ flex: '0.375' }}></div>
+        <div style={{ flex: '1.5', minHeight: 0 }}></div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', flexShrink: 0, pointerEvents: 'auto', marginTop: 'auto' }}>
-            <div style={{ height: '2px', backgroundColor: '#000', width: '100%' }}></div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 2px 1fr', alignItems: 'stretch' }}>
-              <div style={{ fontSize: 'clamp(20px, 4.5vw, 28px)', fontFamily: 'Helvetica, Arial, sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px 0' }}>
-                {formatTime(timeLeft)}
-              </div>
-              
-              <div style={{ backgroundColor: '#000', width: '2px' }}></div>
-              
-              <button
-                onClick={handleSubmit}
-                disabled={screen === 'submitting'}
-                style={{
-                  backgroundColor: '#0066FF',
-                  color: '#fff',
-                  fontSize: 'clamp(14px, 3vw, 18px)',
-                  fontWeight: '500',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontFamily: 'Helvetica, Arial, sans-serif',
-                  padding: '16px 0'
-                }}
-              >
-                SUBMIT
-              </button>
+        <div style={{ display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
+          <div style={{ height: '2px', backgroundColor: '#000', width: '100%' }}></div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 2px 1fr', alignItems: 'stretch' }}>
+            <div style={{ fontSize: 'clamp(20px, 4.5vw, 28px)', fontFamily: 'Helvetica, Arial, sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px 0' }}>
+              {formatTime(timeLeft)}
             </div>
+            
+            <div style={{ backgroundColor: '#000', width: '2px' }}></div>
+            
+            <button
+              onClick={handleSubmit}
+              disabled={screen === 'submitting'}
+              style={{
+                backgroundColor: '#0066FF',
+                color: '#fff',
+                fontSize: 'clamp(14px, 3vw, 18px)',
+                fontWeight: '500',
+                border: 'none',
+                cursor: 'pointer',
+                fontFamily: 'Helvetica, Arial, sans-serif',
+                padding: '16px 0'
+              }}
+            >
+              SUBMIT
+            </button>
           </div>
         </div>
       </div>
