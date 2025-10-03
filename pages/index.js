@@ -584,7 +584,7 @@ export default function Home() {
           "{todayPrompt}"
         </h1>
 
-  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, paddingTop: '16px' }}>
+  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1 }}>
           <canvas
             ref={canvasRef}
             onMouseDown={startDrawing}
@@ -603,30 +603,28 @@ export default function Home() {
               height: 'auto'
             }}
           />
-
-          <div style={{ flex: 1 }}></div>
-          
-          <div style={{ display: 'flex', justifyContent: 'space-evenly', gap: '0', width: '100%', padding: '0 16px' }}>
-            {COLORS.map(color => (
-              <button
-                key={color}
-                onClick={() => setSelectedColor(color)}
-                style={{
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: '50%',
-                  border: selectedColor === color ? '6px solid #666' : '2px solid #000',
-                  backgroundColor: color,
-                  cursor: 'pointer',
-                  padding: 0,
-                  flexShrink: 0
-                }}
-              />
-            ))}
-          </div>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', flexShrink: 0, marginTop: 'auto' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-evenly', width: '100%', padding: '0 8px', flexShrink: 0 }}>
+          {COLORS.map(color => (
+            <button
+              key={color}
+              onClick={() => setSelectedColor(color)}
+              style={{
+                width: '64px',
+                height: '64px',
+                borderRadius: '50%',
+                border: selectedColor === color ? '6px solid #666' : '2px solid #000',
+                backgroundColor: color,
+                cursor: 'pointer',
+                padding: 0,
+                flexShrink: 0
+              }}
+            />
+          ))}
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
           <div style={{ height: '2px', backgroundColor: '#000', width: '100%' }}></div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 2px 1fr', alignItems: 'stretch' }}>
             <div style={{ fontSize: 'clamp(20px, 4.5vw, 28px)', fontFamily: 'Helvetica, Arial, sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px 0' }}>
@@ -634,8 +632,8 @@ export default function Home() {
             </div>
             
             <div style={{ backgroundColor: '#000', width: '2px' }}></div>
-          
-                      <button
+            
+            <button
               onClick={handleSubmit}
               disabled={screen === 'submitting'}
               style={{
