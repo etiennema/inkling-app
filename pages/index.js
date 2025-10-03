@@ -566,14 +566,14 @@ export default function Home() {
           height: '100dvh',
           minHeight: '-webkit-fill-available',
           display: 'grid',
-          gridTemplateRows: 'auto 1fr auto auto',
+          gridTemplateRows: 'auto 1fr auto',
           backgroundColor: '#F5F5DC',
           overflow: 'hidden',
           fontFamily: 'Helvetica, Arial, sans-serif',
           boxSizing: 'border-box'
         }}
       >
-        <h2
+        <h1
           style={{
             fontSize: 'clamp(28px, 6vw, 42px)',
             textAlign: 'center',
@@ -582,7 +582,7 @@ export default function Home() {
           }}
         >
           "{todayPrompt}"
-        </h2>
+        </h1>
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <canvas
@@ -605,8 +605,8 @@ export default function Home() {
           />
         </div>
 
-        <div style={{ padding: '8px 0', marginTop: 'auto' }}>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
+          <div style={{ padding: '8px 0' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
             {COLORS.map(color => (
               <button
                 key={color}
@@ -625,7 +625,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', flexShrink: 0, marginTop: 'auto' }}>
           <div style={{ height: '2px', backgroundColor: '#000', width: '100%' }}></div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 2px 1fr', alignItems: 'stretch' }}>
             <div style={{ fontSize: 'clamp(20px, 4.5vw, 28px)', fontFamily: 'Helvetica, Arial, sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px 0' }}>
