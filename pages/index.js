@@ -561,21 +561,21 @@ export default function Home() {
 
   if (screen === 'drawing') {
     return (
-      <div
-        style={{
-          height: '100dvh',
-          minHeight: '-webkit-fill-available',
-          display: 'grid',
-          gridTemplateRows: 'auto 1fr auto',
-          backgroundColor: '#F5F5DC',
-          overflow: 'hidden',
-          fontFamily: 'Helvetica, Arial, sans-serif',
-          boxSizing: 'border-box'
-        }}
-      >
+    <div
+            style={{
+              height: '100dvh',
+              minHeight: '-webkit-fill-available',
+              display: 'flex',
+              flexDirection: 'column',
+              backgroundColor: '#F5F5DC',
+              overflow: 'hidden',
+              fontFamily: 'Helvetica, Arial, sans-serif',
+              boxSizing: 'border-box'
+            }}
+          >
         <h1
           style={{
-            fontSize: 'clamp(28px, 10vw, 55px)',
+            fontSize: 'clamp(28px, 10vw, 75px)',
             textAlign: 'center',
             margin: '12px 0',
             fontWeight: 'bold'
