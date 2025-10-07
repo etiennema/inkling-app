@@ -12,6 +12,94 @@ const TIMER_DURATION = 60;
 const MIN_COVERAGE = 0.3;
 const MIN_TIME = 3;
 
+function GalleryDrawing({ drawing }) {
+  const canvasRef = useRef(null);
+  const [isAnimating, setIsAnimating] = useState(true);
+  const [hasAnimated, setHasAnimated] = useState(false);
+
+  useEffect(() => {
+    if (!canvasRef.current || hasAnimated) return;
+    
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    
+    // Set canvas size
+    canvas.width = 350;
+    canvas.height = 350;
+    
+    // Fill background
+    ctx.fillStyle = '#F5F5DC';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    
+    const strokes = drawing.stroke_data?.strokes || [];
+    if (strokes.length === 0) {
+      // Fallback to image if no stroke data
+      const img = new Image();
+      img.onload = () => ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      img.src = drawing.image_url;
+      setIsAnimating(false);
+      setHasAnimated(true);
+      return;
+    }
+    
+    // Normalize timing - make all drawings take ~2 seconds total
+    const totalDuration = 2000; // ms
+    const durationPerStroke = totalDuration / strokes.length;
+    
+    let currentStrokeIndex = 0;
+    let currentPointIndex = 0;
+    
+    const animateStrokes = () => {
+      if (currentStrokeIndex >= strokes.length) {
+        setIsAnimating(false);
+        setHasAnimated(true);
+        return;
+      }
+      
+      const stroke = strokes[currentStrokeIndex];
+      const points = stroke.points;
+      
+      if (currentPointIndex === 0) {
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, points[0].y);
+        ctx.strokeStyle = stroke.color;
+        ctx.lineWidth = 5;
+      }
+      
+      if (currentPointIndex < points.length) {
+        const point = points[currentPointIndex];
+        ctx.lineTo(point.x, point.y);
+        ctx.stroke();
+        currentPointIndex++;
+        
+        // Speed: draw points faster (1.5x speed means ~10ms per point)
+        setTimeout(animateStrokes, 10 / 1.5);
+      } else {
+        // Move to next stroke
+        currentStrokeIndex++;
+        currentPointIndex = 0;
+        setTimeout(animateStrokes, 50); // Small pause between strokes
+      }
+    };
+    
+    animateStrokes();
+  }, [drawing, hasAnimated]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      style={{
+        border: '2px solid #000',
+        width: '100%',
+        height: '100%',
+        backgroundColor: '#F5F5DC'
+      }}
+    />
+  );
+}
+
 export default function Home() {
   const [screen, setScreen] = useState('loading');
   const [userId, setUserId] = useState(null);
@@ -798,19 +886,194 @@ if (screen === 'error-validation') {
   }
 
   if (screen === 'gallery') {
-    return (
-      <div style={{ minHeight: '100vh', backgroundColor: '#F5F5DC', padding: '20px', fontFamily: 'Helvetica, Arial, sans-serif' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <h2 style={{ fontSize: '24px', textAlign: 'center', marginBottom: '32px' }}>
-            "{todayPrompt}"
-          </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px' }}>
-            {gallery.map(item => (
-              <div key={item.id} style={{ aspectRatio: '1/1', backgroundColor: '#F5F5DC', border: '2px solid #000' }}>
-                <img src={item.image_url} alt="Drawing" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              </div>
-            ))}
+    const [galleryState, setGalleryState] = useState('loading'); // 'loading', 'loaded', 'error', 'first'
+    const [animatingDrawings, setAnimatingDrawings] = useState(new Set());
+
+    useEffect(() => {
+      // Gallery already loaded in loadGallery function
+      if (gallery.length === 0) {
+        setGalleryState('loading');
+      } else if (gallery.length === 1 && gallery[0].user_id === userId) {
+        setGalleryState('first');
+      } else {
+        setGalleryState('loaded');
+      }
+    }, [gallery]);
+
+    const formatDate = () => {
+      const date = new Date();
+      const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEPT', 'OCT', 'NOV', 'DEC'];
+      return `${months[date.getMonth()]}. ${date.getDate()} ${date.getFullYear()}`;
+    };
+
+    const getRandomPosition = (index, total) => {
+      // Create organic scatter pattern
+      const columns = Math.ceil(Math.sqrt(total * 1.5));
+      const row = Math.floor(index / columns);
+      const col = index % columns;
+      
+      const baseX = (col * 400) + 100;
+      const baseY = (row * 400) + 300;
+      
+      // Add randomness
+      const randomX = (Math.random() - 0.5) * 100;
+      const randomY = (Math.random() - 0.5) * 100;
+      const rotation = (Math.random() - 0.5) * 6; // -3 to +3 degrees
+      
+      return {
+        left: baseX + randomX,
+        top: baseY + randomY,
+        rotation
+      };
+    };
+
+    if (galleryState === 'loading') {
+      return (
+        <div style={{ minHeight: '100vh', backgroundColor: '#F5F5DC', padding: '40px 20px', fontFamily: 'Helvetica, Arial, sans-serif' }}>
+          <h1 style={{ fontSize: 'clamp(48px, 10vw, 72px)', fontWeight: 'bold', margin: '0 0 16px 0', textAlign: 'center' }}>
+            GALLERY
+          </h1>
+          <p style={{ fontSize: 'clamp(16px, 3vw, 20px)', textAlign: 'center', margin: '0 0 60px 0' }}>
+            {formatDate()}
+          </p>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '40vh' }}>
+            <div style={{ fontSize: '48px', letterSpacing: '8px' }}>. . .</div>
           </div>
+        </div>
+      );
+    }
+
+    if (galleryState === 'error') {
+      return (
+        <div 
+          onClick={() => {
+            setGalleryState('loading');
+            loadGallery(promptIndex);
+          }}
+          style={{ 
+            minHeight: '100vh', 
+            backgroundColor: '#F5F5DC', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            padding: '20px', 
+            fontFamily: 'Helvetica, Arial, sans-serif',
+            cursor: 'pointer'
+          }}
+        >
+          <div>
+            <h1 style={{ fontSize: 'clamp(48px, 10vw, 72px)', fontWeight: 'bold', margin: '0 0 16px 0', textAlign: 'center', position: 'absolute', top: '40px', left: 0, right: 0 }}>
+              GALLERY
+            </h1>
+            <p style={{ fontSize: 'clamp(16px, 3vw, 20px)', textAlign: 'center', position: 'absolute', top: '140px', left: 0, right: 0 }}>
+              {formatDate()}
+            </p>
+          </div>
+          
+          <div style={{ 
+            backgroundColor: '#000', 
+            color: '#fff', 
+            padding: '60px 48px', 
+            maxWidth: '600px', 
+            width: '100%',
+            position: 'relative'
+          }}>
+            <p style={{ fontSize: 'clamp(20px, 4vw, 24px)', lineHeight: '1.4', margin: '0 0 24px 0', fontWeight: '500', textAlign: 'left' }}>
+              COULDN'T LOAD GALLERY.
+            </p>
+            <p style={{ fontSize: 'clamp(20px, 4vw, 24px)', lineHeight: '1.4', margin: 0, fontWeight: '500', textAlign: 'left' }}>
+              CHECK YOUR CONNECTION AND TRY AGAIN.
+            </p>
+            
+            <div style={{ position: 'absolute', bottom: '32px', left: '32px' }}>
+              <svg width="165" height="83" viewBox="0 0 165 83" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M14 41.5H137.5M137.5 41.5L110 27.5M137.5 41.5L110 55.5" stroke="#0066FF" strokeWidth="5.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    if (galleryState === 'first') {
+      const userDrawing = gallery[0];
+      return (
+        <div style={{ minHeight: '100vh', backgroundColor: '#F5F5DC', padding: '40px 20px', fontFamily: 'Helvetica, Arial, sans-serif', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <h1 style={{ fontSize: 'clamp(48px, 10vw, 72px)', fontWeight: 'bold', margin: '0 0 16px 0', textAlign: 'center' }}>
+            GALLERY
+          </h1>
+          <p style={{ fontSize: 'clamp(16px, 3vw, 20px)', textAlign: 'center', margin: '0 0 60px 0' }}>
+            {formatDate()}
+          </p>
+          
+          <div style={{ marginBottom: '40px', maxWidth: '400px', width: '100%', aspectRatio: '1/1' }}>
+            <img src={userDrawing.image_url} alt="Your drawing" style={{ border: '2px solid #000', width: '100%', height: '100%', objectFit: 'cover' }} />
+          </div>
+          
+          <p style={{ fontSize: 'clamp(18px, 4vw, 24px)', textAlign: 'center', margin: '0 0 80px 0', lineHeight: '1.4', maxWidth: '500px' }}>
+            YOU'RE FIRST TODAY!<br />
+            COME BACK IN A BIT TO SEE SOME OTHER CREATIONS.
+          </p>
+          
+          <div 
+            onClick={() => setScreen('already-done')}
+            style={{ cursor: 'pointer', marginTop: 'auto' }}
+          >
+            <svg width="165" height="83" viewBox="0 0 165 83" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M14 41.5H137.5M137.5 41.5L110 27.5M137.5 41.5L110 55.5" stroke="#0066FF" strokeWidth="5.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+        </div>
+      );
+    }
+
+    // Main gallery view with scattered drawings
+    return (
+      <div style={{ minHeight: '100vh', backgroundColor: '#F5F5DC', fontFamily: 'Helvetica, Arial, sans-serif', overflow: 'auto', position: 'relative' }}>
+        <div style={{ position: 'sticky', top: 0, backgroundColor: '#F5F5DC', padding: '40px 20px 20px', zIndex: 10 }}>
+          <h1 style={{ fontSize: 'clamp(48px, 10vw, 72px)', fontWeight: 'bold', margin: '0 0 16px 0', textAlign: 'center' }}>
+            GALLERY
+          </h1>
+          <p style={{ fontSize: 'clamp(16px, 3vw, 20px)', textAlign: 'center', margin: 0 }}>
+            {formatDate()}
+          </p>
+        </div>
+        
+        <div style={{ position: 'relative', minHeight: '200vh', padding: '20px' }}>
+          {gallery.map((item, index) => {
+            const pos = getRandomPosition(index, gallery.length);
+            return (
+              <div
+                key={item.id}
+                style={{
+                  position: 'absolute',
+                  left: `${pos.left}px`,
+                  top: `${pos.top}px`,
+                  transform: `rotate(${pos.rotation}deg)`,
+                  width: '350px',
+                  height: '350px'
+                }}
+              >
+                <GalleryDrawing drawing={item} />
+              </div>
+            );
+          })}
+        </div>
+        
+        <div 
+          onClick={() => setScreen('already-done')}
+          style={{ 
+            position: 'fixed', 
+            bottom: '40px', 
+            left: '50%', 
+            transform: 'translateX(-50%)',
+            cursor: 'pointer',
+            zIndex: 20
+          }}
+        >
+          <svg width="165" height="83" viewBox="0 0 165 83" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M14 41.5H137.5M137.5 41.5L110 27.5M137.5 41.5L110 55.5" stroke="#0066FF" strokeWidth="5.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
         </div>
       </div>
     );
