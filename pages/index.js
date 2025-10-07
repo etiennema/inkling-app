@@ -694,7 +694,7 @@ export default function Home() {
         <div style={{ 
           backgroundColor: '#000', 
           color: '#fff', 
-          padding: '90px 48px', 
+          padding: '90px 48px 80px 48px', 
           maxWidth: '600px', 
           width: '100%',
           position: 'relative'
@@ -702,8 +702,11 @@ export default function Home() {
           <p style={{ fontSize: 'clamp(24px, 5vw, 32px)', lineHeight: '1.4', margin: '0 0 32px 0', fontWeight: '500', textAlign: 'left' }}>
             YOU CAN DO IT!
           </p>
-          <p style={{ fontSize: 'clamp(24px, 5vw, 32px)', lineHeight: '1.4', margin: 0, fontWeight: '500', textAlign: 'left' }}>
+          <p style={{ fontSize: 'clamp(24px, 5vw, 32px)', lineHeight: '1.4', margin: '0 0 40px 0', fontWeight: '500', textAlign: 'left' }}>
             DRAW SOMETHING—ANYTHING!
+          </p>
+          <p style={{ fontSize: 'clamp(12px, 2.5vw, 16px)', lineHeight: '1.4', margin: 0, fontWeight: '400', textAlign: 'left' }}>
+            YOU CAN'T JUST SUBMIT AN EMPTY CANVAS
           </p>
           
           <div style={{ position: 'absolute', bottom: '32px', right: '48px' }}>
