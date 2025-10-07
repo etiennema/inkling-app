@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
@@ -9,7 +9,7 @@ const supabase = createClient(
 const COLORS = ['#000000', '#0066FF', '#FF0000', '#00CC00', '#FFCC00'];
 const BRUSH_SIZE = 5;
 const TIMER_DURATION = 60;
-const MIN_COVERAGE = 0.003;
+const MIN_COVERAGE = 0.002;
 const MIN_TIME = 3;
 
 // Helper functions
@@ -148,43 +148,27 @@ export default function Home() {
     initializeApp();
   }, []);
 
-  const handleAutoSubmit = async () => {
-    const coverage = calculateCoverage();
-    const drawingTime = firstStrokeTime ? (Date.now() - firstStrokeTime) / 1000 : 0;
-
-    if (coverage < MIN_COVERAGE) {
-      setErrorMessage('blank');
-      setScreen('error-validation');
-      setTimeLeft(TIMER_DURATION);
-      setStrokes([]);
-      setFirstStrokeTime(null);
-      return;
-    }
-
-    await submitDrawing(coverage, drawingTime);
-  };
-
   useEffect(() => {
-      if (screen === 'drawing' && timeLeft > 0) {
-        timerRef.current = setInterval(() => {
-          setTimeLeft(prev => {
-            if (prev <= 1) {
-              handleAutoSubmit();
-              return 0;
-            }
-            return prev - 1;
-          });
-        }, 1000);
-
-        return () => {
-          if (timerRef.current) {
-            clearInterval(timerRef.current);
+    if (screen === 'drawing' && timeLeft > 0) {
+      timerRef.current = setInterval(() => {
+        setTimeLeft(prev => {
+          if (prev <= 1) {
+            handleAutoSubmit();
+            return 0;
           }
-        };
-      } else if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-    }, [screen, timeLeft, handleAutoSubmit]);
+          return prev - 1;
+        });
+      }, 1000);
+
+      return () => {
+        if (timerRef.current) {
+          clearInterval(timerRef.current);
+        }
+      };
+    } else if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+  }, [screen, timeLeft]);
 
   useEffect(() => {
     if (screen === 'already-done') {
@@ -503,7 +487,23 @@ export default function Home() {
 
     await submitDrawing(coverage, drawingTime);
   };
-  
+
+  const handleAutoSubmit = async () => {
+    const coverage = calculateCoverage();
+    const drawingTime = firstStrokeTime ? (Date.now() - firstStrokeTime) / 1000 : 0;
+
+    if (coverage < MIN_COVERAGE) {
+      setErrorMessage('blank');
+      setScreen('error-validation');
+      setTimeLeft(TIMER_DURATION);
+      setStrokes([]);
+      setFirstStrokeTime(null);
+      return;
+    }
+
+    await submitDrawing(coverage, drawingTime);
+  };
+
   const submitDrawing = async (coverage, drawingTime) => {
     setIsSubmitting(true);
     setScreen('submitting');
