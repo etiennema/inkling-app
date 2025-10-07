@@ -1114,13 +1114,14 @@ useEffect(() => {
       <div 
         data-gallery-container
         ref={(el) => {
-          if (el && galleryState === 'loaded') {
-            // Center on user's drawing on mount
-            const scrollX = userDrawingPos.left - minX + (containerWidth / 2) - (window.innerWidth / 2);
-            const scrollY = userDrawingPos.top - minY + (containerHeight / 2) - ((window.innerHeight - 150) / 2); // 150 = approx header height
-            el.scrollTo(scrollX, scrollY);
-          }
-        }}
+              ref={(el) => {
+        if (el && galleryState === 'loaded') {
+          // Center on user's drawing horizontally, start at top vertically
+          const scrollX = (userDrawingPos.left - minX) - (window.innerWidth / 2) + 175; // 175 = half of drawing width
+          const scrollY = 0;
+          el.scrollTo(scrollX, scrollY);
+        }
+      }}
         style={{ 
           flex: 1,
           overflow: 'auto',
@@ -1142,8 +1143,8 @@ useEffect(() => {
                 key={item.id}
                 style={{
                   position: 'absolute',
-                  left: `${pos.left - minX + (containerWidth / 2)}px`,
-                  top: `${pos.top - minY + (containerHeight / 2)}px`,
+                  left: `${pos.left - minX}px`,
+                  top: `${pos.top - minY}px`,
                   transform: `translate(-50%, -50%) rotate(${pos.rotation}deg)`,
                   width: '350px',
                   height: '350px'
