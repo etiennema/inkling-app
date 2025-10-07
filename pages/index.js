@@ -432,10 +432,8 @@ export default function Home() {
           document.body.style.backgroundColor = '#F5F5DC';
           setScreen('congrats');
           
-          setTimeout(() => {
-            setScreen('gallery');
-            document.body.style.transition = '';
-          }, 2000);
+        setScreen('congrats');
+          document.body.style.transition = '';
         }, 200);
       }, 900);
 
@@ -721,10 +719,47 @@ if (screen === 'error-validation') {
 
   if (screen === 'congrats') {
     return (
-      <div style={{ minHeight: '100vh', backgroundColor: '#F5F5DC', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'Helvetica, Arial, sans-serif' }}>
-        <div style={{ textAlign: 'center' }}>
-          <p style={{ fontSize: '24px', fontWeight: 'bold' }}>CONGRATS!</p>
-          <p style={{ fontSize: '18px' }}>YOU'VE COMPLETED {submissionCount} DRAWING{submissionCount !== 1 ? 'S' : ''} SO FAR</p>
+      <div 
+        onClick={() => setScreen('gallery')}
+        style={{ 
+          minHeight: '100vh', 
+          backgroundColor: '#F5F5DC', 
+          display: 'flex', 
+          flexDirection: 'column',
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          padding: '40px 20px', 
+          fontFamily: 'Helvetica, Arial, sans-serif',
+          cursor: 'pointer',
+          position: 'relative'
+        }}
+      >
+        <h1 style={{ fontSize: 'clamp(48px, 10vw, 72px)', fontWeight: 'bold', margin: '0 0 60px 0', textAlign: 'center' }}>
+          CONGRATS!
+        </h1>
+        
+        <div style={{ marginBottom: '40px', maxWidth: '400px', width: '100%', aspectRatio: '1/1' }}>
+          <canvas
+            ref={canvasRef}
+            style={{
+              border: '2px solid #000',
+              width: '100%',
+              height: '100%',
+              pointerEvents: 'none'
+            }}
+          />
+        </div>
+        
+        <p style={{ fontSize: 'clamp(18px, 4vw, 24px)', textAlign: 'center', margin: '0 0 60px 0', lineHeight: '1.4' }}>
+          YOU'VE COMPLETED<br />
+          <strong style={{ fontSize: 'clamp(36px, 8vw, 56px)' }}>{submissionCount}</strong><br />
+          DRAWING{submissionCount !== 1 ? 'S' : ''} SO FAR.
+        </p>
+        
+        <div style={{ position: 'absolute', bottom: '40px' }}>
+          <svg width="165" height="83" viewBox="0 0 165 83" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M14 41.5H137.5M137.5 41.5L110 27.5M137.5 41.5L110 55.5" stroke="#0066FF" strokeWidth="5.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
         </div>
       </div>
     );
