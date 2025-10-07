@@ -12,6 +12,32 @@ const TIMER_DURATION = 60;
 const MIN_COVERAGE = 0.3;
 const MIN_TIME = 3;
 
+// Helper functions
+const formatDate = () => {
+  const date = new Date();
+  const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEPT', 'OCT', 'NOV', 'DEC'];
+  return `${months[date.getMonth()]}. ${date.getDate()} ${date.getFullYear()}`;
+};
+
+const getRandomPosition = (index, total) => {
+  const columns = Math.ceil(Math.sqrt(total * 1.5));
+  const row = Math.floor(index / columns);
+  const col = index % columns;
+  
+  const baseX = (col * 400) + 100;
+  const baseY = (row * 400) + 300;
+  
+  const randomX = (Math.random() - 0.5) * 100;
+  const randomY = (Math.random() - 0.5) * 100;
+  const rotation = (Math.random() - 0.5) * 6;
+  
+  return {
+    left: baseX + randomX,
+    top: baseY + randomY,
+    rotation
+  };
+};
+
 function GalleryDrawing({ drawing }) {
   const canvasRef = useRef(null);
   const [isAnimating, setIsAnimating] = useState(true);
@@ -23,11 +49,9 @@ function GalleryDrawing({ drawing }) {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     
-    // Set canvas size
     canvas.width = 350;
     canvas.height = 350;
     
-    // Fill background
     ctx.fillStyle = '#F5F5DC';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.lineCap = 'round';
@@ -35,7 +59,6 @@ function GalleryDrawing({ drawing }) {
     
     const strokes = drawing.stroke_data?.strokes || [];
     if (strokes.length === 0) {
-      // Fallback to image if no stroke data
       const img = new Image();
       img.onload = () => ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
       img.src = drawing.image_url;
@@ -44,8 +67,7 @@ function GalleryDrawing({ drawing }) {
       return;
     }
     
-    // Normalize timing - make all drawings take ~2 seconds total
-    const totalDuration = 2000; // ms
+    const totalDuration = 2000;
     const durationPerStroke = totalDuration / strokes.length;
     
     let currentStrokeIndex = 0;
@@ -74,13 +96,11 @@ function GalleryDrawing({ drawing }) {
         ctx.stroke();
         currentPointIndex++;
         
-        // Speed: draw points faster (1.5x speed means ~10ms per point)
         setTimeout(animateStrokes, 10 / 1.5);
       } else {
-        // Move to next stroke
         currentStrokeIndex++;
         currentPointIndex = 0;
-        setTimeout(animateStrokes, 50); // Small pause between strokes
+        setTimeout(animateStrokes, 50);
       }
     };
     
@@ -119,6 +139,7 @@ export default function Home() {
   const [countdown, setCountdown] = useState('');
   const [submittingDots, setSubmittingDots] = useState(1);
   const [lastSubmittedImage, setLastSubmittedImage] = useState(null);
+  const [galleryState, setGalleryState] = useState('loading');
   
   const canvasRef = useRef(null);
   const timerRef = useRef(null);
@@ -127,30 +148,28 @@ export default function Home() {
     initializeApp();
   }, []);
 
-  // Timer effect
-    useEffect(() => {
-      if (screen === 'drawing' && timeLeft > 0) {
-        timerRef.current = setInterval(() => {
-          setTimeLeft(prev => {
-            if (prev <= 1) {
-              handleAutoSubmit();
-              return 0;
-            }
-            return prev - 1;
-          });
-        }, 1000);
-
-        return () => {
-          if (timerRef.current) {
-            clearInterval(timerRef.current);
+  useEffect(() => {
+    if (screen === 'drawing' && timeLeft > 0) {
+      timerRef.current = setInterval(() => {
+        setTimeLeft(prev => {
+          if (prev <= 1) {
+            handleAutoSubmit();
+            return 0;
           }
-        };
-      } else if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-    }, [screen, timeLeft]);
+          return prev - 1;
+        });
+      }, 1000);
 
-  // Countdown effect
+      return () => {
+        if (timerRef.current) {
+          clearInterval(timerRef.current);
+        }
+      };
+    } else if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+  }, [screen, timeLeft]);
+
   useEffect(() => {
     if (screen === 'already-done') {
       const interval = setInterval(() => {
@@ -160,7 +179,6 @@ export default function Home() {
     }
   }, [screen]);
 
-  // Canvas resize effect
   useEffect(() => {
     if (screen === 'drawing' || screen === 'submitting') {
       const resizeCanvas = () => {
@@ -180,6 +198,18 @@ export default function Home() {
       return () => window.removeEventListener('resize', resizeCanvas);
     }
   }, [screen]);
+
+  useEffect(() => {
+    if (screen === 'gallery') {
+      if (gallery.length === 0) {
+        setGalleryState('loading');
+      } else if (gallery.length === 1 && gallery[0].user_id === userId) {
+        setGalleryState('first');
+      } else {
+        setGalleryState('loaded');
+      }
+    }
+  }, [screen, gallery, userId]);
 
   const initializeApp = async () => {
     try {
@@ -260,7 +290,7 @@ export default function Home() {
 
       const { data: submissions, error: submissionError } = await supabase
         .from('submissions')
-        .select('id, image_url, submitted_at')
+        .select('id, image_url, submitted_at, user_id')
         .eq('user_id', uid)
         .eq('prompt_index', currentPromptIndex)
         .gte('submitted_at', startOfToday.toISOString())
@@ -291,7 +321,7 @@ export default function Home() {
     try {
       const { data, error } = await supabase
         .from('submissions')
-        .select('id, image_url, stroke_data, submitted_at')
+        .select('id, image_url, stroke_data, submitted_at, user_id')
         .eq('prompt_index', pIndex)
         .order('submitted_at', { ascending: false });
 
@@ -299,6 +329,7 @@ export default function Home() {
       setGallery(data || []);
     } catch (error) {
       console.error('Gallery load error:', error);
+      setGalleryState('error');
     }
   };
 
@@ -413,11 +444,14 @@ export default function Home() {
 
   const calculateCoverage = () => {
     const canvas = canvasRef.current;
+    if (!canvas) return 0;
+    
     const ctx = canvas.getContext('2d');
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const pixels = imageData.data;
     
     let markedPixels = 0;
+    const totalPixels = pixels.length / 4;
     const bgR = 245, bgG = 245, bgB = 220;
     
     for (let i = 0; i < pixels.length; i += 4) {
@@ -430,7 +464,7 @@ export default function Home() {
       }
     }
     
-    return (markedPixels / (pixels.length / 4)) * 100;
+    return markedPixels / totalPixels;
   };
 
   const handleSubmit = async () => {
@@ -455,11 +489,8 @@ export default function Home() {
   };
 
   const handleAutoSubmit = async () => {
-  console.log('Auto-submit triggered');
-  const coverage = calculateCoverage();
-  console.log('Coverage:', coverage, 'MIN_COVERAGE:', MIN_COVERAGE);
-  const drawingTime = firstStrokeTime ? (Date.now() - firstStrokeTime) / 1000 : 0;
-  console.log('Drawing time:', drawingTime);
+    const coverage = calculateCoverage();
+    const drawingTime = firstStrokeTime ? (Date.now() - firstStrokeTime) / 1000 : 0;
 
     if (coverage < MIN_COVERAGE) {
       setErrorMessage('blank');
@@ -505,9 +536,9 @@ export default function Home() {
 
       if (insertError) throw insertError;
 
-        setLastSubmittedImage(publicUrl);
-        setSubmissionCount(prev => prev + 1);
-        await loadGallery(promptIndex);
+      setLastSubmittedImage(publicUrl);
+      setSubmissionCount(prev => prev + 1);
+      await loadGallery(promptIndex);
 
       const dotInterval = setInterval(() => {
         setSubmittingDots(prev => prev === 3 ? 1 : prev + 1);
@@ -521,8 +552,6 @@ export default function Home() {
         setTimeout(() => {
           document.body.style.backgroundColor = '#F5F5DC';
           setScreen('congrats');
-          
-        setScreen('congrats');
           document.body.style.transition = '';
         }, 200);
       }, 900);
@@ -656,7 +685,7 @@ export default function Home() {
     );
   }
 
- if (screen === 'drawing') {
+  if (screen === 'drawing') {
     return (
       <div
         style={{
@@ -764,7 +793,7 @@ export default function Home() {
     );
   }
 
-if (screen === 'error-validation') {
+  if (screen === 'error-validation') {
     return (
       <div 
         onClick={handleRetry}
@@ -886,47 +915,6 @@ if (screen === 'error-validation') {
   }
 
   if (screen === 'gallery') {
-    const [galleryState, setGalleryState] = useState('loading'); // 'loading', 'loaded', 'error', 'first'
-    const [animatingDrawings, setAnimatingDrawings] = useState(new Set());
-
-    useEffect(() => {
-      // Gallery already loaded in loadGallery function
-      if (gallery.length === 0) {
-        setGalleryState('loading');
-      } else if (gallery.length === 1 && gallery[0].user_id === userId) {
-        setGalleryState('first');
-      } else {
-        setGalleryState('loaded');
-      }
-    }, [gallery]);
-
-    const formatDate = () => {
-      const date = new Date();
-      const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEPT', 'OCT', 'NOV', 'DEC'];
-      return `${months[date.getMonth()]}. ${date.getDate()} ${date.getFullYear()}`;
-    };
-
-    const getRandomPosition = (index, total) => {
-      // Create organic scatter pattern
-      const columns = Math.ceil(Math.sqrt(total * 1.5));
-      const row = Math.floor(index / columns);
-      const col = index % columns;
-      
-      const baseX = (col * 400) + 100;
-      const baseY = (row * 400) + 300;
-      
-      // Add randomness
-      const randomX = (Math.random() - 0.5) * 100;
-      const randomY = (Math.random() - 0.5) * 100;
-      const rotation = (Math.random() - 0.5) * 6; // -3 to +3 degrees
-      
-      return {
-        left: baseX + randomX,
-        top: baseY + randomY,
-        rotation
-      };
-    };
-
     if (galleryState === 'loading') {
       return (
         <div style={{ minHeight: '100vh', backgroundColor: '#F5F5DC', padding: '40px 20px', fontFamily: 'Helvetica, Arial, sans-serif' }}>
@@ -1007,7 +995,7 @@ if (screen === 'error-validation') {
           </p>
           
           <div style={{ marginBottom: '40px', maxWidth: '400px', width: '100%', aspectRatio: '1/1' }}>
-            <img src={userDrawing.image_url} alt="Your drawing" style={{ border: '2px solid #000', width: '100%', height: '100%', objectFit: 'cover' }} />
+            <GalleryDrawing drawing={userDrawing} />
           </div>
           
           <p style={{ fontSize: 'clamp(18px, 4vw, 24px)', textAlign: 'center', margin: '0 0 80px 0', lineHeight: '1.4', maxWidth: '500px' }}>
@@ -1027,7 +1015,6 @@ if (screen === 'error-validation') {
       );
     }
 
-    // Main gallery view with scattered drawings
     return (
       <div style={{ minHeight: '100vh', backgroundColor: '#F5F5DC', fontFamily: 'Helvetica, Arial, sans-serif', overflow: 'auto', position: 'relative' }}>
         <div style={{ position: 'sticky', top: 0, backgroundColor: '#F5F5DC', padding: '40px 20px 20px', zIndex: 10 }}>
