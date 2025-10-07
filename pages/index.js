@@ -1178,6 +1178,7 @@ useEffect(() => {
       </div>
     </div>
   );
+}
 
 return null;
-  }
+}
