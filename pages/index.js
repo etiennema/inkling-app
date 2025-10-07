@@ -694,21 +694,21 @@ export default function Home() {
         <div style={{ 
           backgroundColor: '#000', 
           color: '#fff', 
-          padding: '60px 40px', 
+          padding: '90px 48px', 
           maxWidth: '600px', 
           width: '100%',
           position: 'relative'
         }}>
-          <p style={{ fontSize: 'clamp(24px, 5vw, 32px)', lineHeight: '1.4', margin: '0 0 24px 0', fontWeight: '500', textAlign: 'center' }}>
+          <p style={{ fontSize: 'clamp(24px, 5vw, 32px)', lineHeight: '1.4', margin: '0 0 32px 0', fontWeight: '500', textAlign: 'left' }}>
             YOU CAN DO IT!
           </p>
-          <p style={{ fontSize: 'clamp(24px, 5vw, 32px)', lineHeight: '1.4', margin: 0, fontWeight: '500', textAlign: 'center' }}>
+          <p style={{ fontSize: 'clamp(24px, 5vw, 32px)', lineHeight: '1.4', margin: 0, fontWeight: '500', textAlign: 'left' }}>
             DRAW SOMETHING—ANYTHING!
           </p>
           
-          <div style={{ position: 'absolute', bottom: '24px', right: '24px' }}>
-            <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M10 30H50M50 30L35 15M50 30L35 45" stroke="#0066FF" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+          <div style={{ position: 'absolute', bottom: '32px', right: '48px' }}>
+            <svg width="120" height="60" viewBox="0 0 120 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 30H110M110 30L85 15M110 30L85 45" stroke="#0066FF" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
         </div>
