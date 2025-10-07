@@ -709,9 +709,9 @@ if (screen === 'error-validation') {
             (YOU CAN'T JUST SUBMIT AN EMPTY CANVAS)
           </p>
           
-          <div style={{ position: 'absolute', bottom: '32px', left: '68px' }}>
-            <svg width="120" height="60" viewBox="0 0 120 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M10 30H100M100 30L80 20M100 30L80 40" stroke="#0066FF" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+          <div style={{ position: 'absolute', bottom: '32px', left: '32px' }}>
+            <svg width="210" height="105" viewBox="0 0 210 105" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M17.5 52.5H175M175 52.5L140 35M175 52.5L140 70" stroke="#0066FF" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
         </div>
