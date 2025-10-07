@@ -1084,101 +1084,116 @@ useEffect(() => {
     );
   }
 
-  // Calculate gallery container dimensions based on drawing positions
-  const positions = gallery.map((_, index) => getRandomPosition(index, gallery.length));
-  
-  const minX = Math.min(...positions.map(p => p.left)) - 400;
-  const maxX = Math.max(...positions.map(p => p.left)) + 400;
-  const minY = Math.min(...positions.map(p => p.top)) - 400;
-  const maxY = Math.max(...positions.map(p => p.top)) + 400;
-  
-  const containerWidth = maxX - minX + 700; // +700 for drawing size
-  const containerHeight = maxY - minY + 700;
-  
-  // User's drawing is always at index 0 now
-  const userDrawingPos = positions[0];
+// Calculate gallery container dimensions based on drawing positions
+const positions = gallery.map((_, index) => getRandomPosition(index, gallery.length));
 
-  return (
-    <div style={{ height: '100vh', backgroundColor: '#F5F5DC', fontFamily: 'Helvetica, Arial, sans-serif', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-      {/* Header - scrolls with content */}
-      <div style={{ padding: '40px 20px 20px', flexShrink: 0 }}>
-        <h1 style={{ fontSize: 'clamp(48px, 10vw, 72px)', fontWeight: 'bold', margin: '0 0 16px 0', textAlign: 'center' }}>
-          GALLERY
-        </h1>
-        <p style={{ fontSize: 'clamp(16px, 3vw, 20px)', textAlign: 'center', margin: 0 }}>
-          {formatDate()}
-        </p>
-      </div>
-      
-      {/* Scrollable gallery container */}
-      <div 
-        data-gallery-container
-        ref={(el) => {
-            if (el && galleryState === 'loaded') {
-              // Center on user's drawing horizontally, start at top vertically
-              const scrollX = (userDrawingPos.left - minX) - (window.innerWidth / 2) + 175; // 175 = half of drawing width
-              const scrollY = 0;
-              el.scrollTo(scrollX, scrollY);
-            }
-          }}
-        style={{ 
-          flex: 1,
-          overflow: 'auto',
-          position: 'relative'
-        }}
-      >
-        <div style={{ 
-          position: 'relative', 
-          width: `${containerWidth}px`, 
-          height: `${containerHeight}px`,
-          minHeight: '100%'
-        }}>
-          {gallery.map((item, index) => {
-            const pos = positions[index];
-            const isUserDrawing = index === 0; // User's drawing is always first now
-            
-            return (
-              <div
-                key={item.id}
-                style={{
-                  position: 'absolute',
-                  left: `${pos.left - minX}px`,
-                  top: `${pos.top - minY}px`,
-                  transform: `translate(-50%, -50%) rotate(${pos.rotation}deg)`,
-                  width: '350px',
-                  height: '350px'
-                }}
-              >
-                <GalleryDrawing 
-                  drawing={item} 
-                  index={index}
-                  isUserDrawing={isUserDrawing}
-                />
-              </div>
-            );
-          })}
-        </div>
-      </div>
-      
-      {/* Fixed back button */}
-      <div 
-        onClick={() => setScreen('already-done')}
-        style={{ 
-          position: 'fixed', 
-          bottom: '40px', 
-          left: '50%', 
-          transform: 'translateX(-50%)',
-          cursor: 'pointer',
-          zIndex: 20
-        }}
-      >
-        <svg width="165" height="83" viewBox="0 0 165 83" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M14 41.5H137.5M137.5 41.5L110 27.5M137.5 41.5L110 55.5" stroke="#0066FF" strokeWidth="5.5" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
+// User's drawing is always at index 0
+const userDrawingPos = positions[0];
+
+// Find the bounds of all drawings relative to their original positions
+const minX = Math.min(...positions.map(p => p.left));
+const maxX = Math.max(...positions.map(p => p.left));
+const minY = Math.min(...positions.map(p => p.top));
+const maxY = Math.max(...positions.map(p => p.top));
+
+// Calculate how much we need to offset to put user's drawing near top
+const headerHeight = 200; // Space for header + breathing room
+const userDrawingOffsetY = headerHeight - (userDrawingPos.top - minY);
+
+// Calculate container dimensions with padding
+const padding = 400;
+const containerWidth = (maxX - minX) + (padding * 2) + 350; // 350 = drawing size
+const containerHeight = (maxY - minY) + (padding * 2) + 350 + userDrawingOffsetY;
+
+// Calculate final positions (offset from minX/minY, plus padding, plus user drawing offset)
+const finalPositions = positions.map(pos => ({
+  left: pos.left - minX + padding,
+  top: pos.top - minY + padding + userDrawingOffsetY,
+  rotation: pos.rotation
+}));
+
+const userFinalPos = finalPositions[0];
+
+return (
+  <div style={{ height: '100vh', backgroundColor: '#F5F5DC', fontFamily: 'Helvetica, Arial, sans-serif', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+    {/* Header - scrolls with content */}
+    <div style={{ padding: '40px 20px 20px', flexShrink: 0 }}>
+      <h1 style={{ fontSize: 'clamp(48px, 10vw, 72px)', fontWeight: 'bold', margin: '0 0 16px 0', textAlign: 'center' }}>
+        GALLERY
+      </h1>
+      <p style={{ fontSize: 'clamp(16px, 3vw, 20px)', textAlign: 'center', margin: 0 }}>
+        {formatDate()}
+      </p>
+    </div>
+    
+    {/* Scrollable gallery container */}
+    <div 
+      data-gallery-container
+      ref={(el) => {
+        if (el && galleryState === 'loaded') {
+          // Center user's drawing horizontally, start at top vertically
+          const scrollX = userFinalPos.left - (window.innerWidth / 2) + 175; // 175 = half of drawing width (350/2)
+          const scrollY = 0;
+          el.scrollTo(scrollX, scrollY);
+        }
+      }}
+      style={{ 
+        flex: 1,
+        overflow: 'auto',
+        position: 'relative'
+      }}
+    >
+      <div style={{ 
+        position: 'relative', 
+        width: `${containerWidth}px`, 
+        height: `${containerHeight}px`,
+        minHeight: '100%'
+      }}>
+        {gallery.map((item, index) => {
+          const pos = finalPositions[index];
+          const isUserDrawing = index === 0;
+          
+          return (
+            <div
+              key={item.id}
+              style={{
+                position: 'absolute',
+                left: `${pos.left}px`,
+                top: `${pos.top}px`,
+                transform: `translate(-50%, -50%) rotate(${pos.rotation}deg)`,
+                width: '350px',
+                height: '350px'
+              }}
+            >
+              <GalleryDrawing 
+                drawing={item} 
+                index={index}
+                isUserDrawing={isUserDrawing}
+              />
+            </div>
+          );
+        })}
       </div>
     </div>
-  );
-}
+    
+    {/* Fixed back button */}
+    <div 
+      onClick={() => setScreen('already-done')}
+      style={{ 
+        position: 'fixed', 
+        bottom: '40px', 
+        left: '50%', 
+        transform: 'translateX(-50%)',
+        cursor: 'pointer',
+        zIndex: 20
+      }}
+    >
+      <svg width="165" height="83" viewBox="0 0 165 83" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M14 41.5H137.5M137.5 41.5L110 27.5M137.5 41.5L110 55.5" stroke="#0066FF" strokeWidth="5.5" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+    </div>
+  </div>
+);
 
 return null;
 }
