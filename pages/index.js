@@ -202,11 +202,7 @@ export default function Home() {
   const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 }); // ADD THIS
   
   const canvasRef = useRef(null);
-  const timerRef = useRef(null);  const [lastSubmittedImage, setLastSubmittedImage] = useState(null);
-  const [galleryState, setGalleryState] = useState('loading');
-  
-  const canvasRef = useRef(null);
-  const timerRef = useRef(null);
+  const timerRef = useRef(null); 
 
   useEffect(() => {
     initializeApp();
@@ -294,18 +290,6 @@ useEffect(() => {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-
-  const initializeApp = async () => {
-    if (screen === 'gallery') {
-      if (gallery.length === 0) {
-        setGalleryState('loading');
-      } else if (gallery.length === 1 && gallery[0].user_id === userId) {
-        setGalleryState('first');
-      } else {
-        setGalleryState('loaded');
-      }
-    }
-  }, [screen, gallery, userId]);
 
   const initializeApp = async () => {
     try {
