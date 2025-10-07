@@ -676,33 +676,41 @@ export default function Home() {
     );
   }
 
-  if (screen === 'error-validation') {
+ if (screen === 'error-validation') {
     return (
-      <div style={{ minHeight: '100vh', backgroundColor: '#F5F5DC', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'Helvetica, Arial, sans-serif' }}>
-        <div style={{ maxWidth: '400px', width: '100%' }}>
-          <div style={{ backgroundColor: '#000', color: '#fff', padding: '32px', marginBottom: '32px' }}>
-            <p style={{ fontSize: '14px', lineHeight: '1.6', margin: 0 }}>
-              {errorMessage === 'blank' && "OOPS. THERE'S NO BLANK CANVASES ALLOWED. YOU'RE ALMOST THERE!"}
-              {errorMessage === 'time' && "YOU CAN DO IT! KEEP GOING! FOLLOW ANY THEME."}
-              {errorMessage === 'network' && "OOF. PLEASE TRY AGAIN. IF YOU'RE HAVING AN ISSUE, PLEASE LET US KNOW."}
-            </p>
+      <div 
+        onClick={handleRetry}
+        style={{ 
+          minHeight: '100vh', 
+          backgroundColor: '#F5F5DC', 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          padding: '20px', 
+          fontFamily: 'Helvetica, Arial, sans-serif',
+          cursor: 'pointer'
+        }}
+      >
+        <div style={{ 
+          backgroundColor: '#000', 
+          color: '#fff', 
+          padding: '60px 40px', 
+          maxWidth: '600px', 
+          width: '100%',
+          position: 'relative'
+        }}>
+          <p style={{ fontSize: 'clamp(24px, 5vw, 32px)', lineHeight: '1.4', margin: '0 0 24px 0', fontWeight: '500', textAlign: 'center' }}>
+            YOU CAN DO IT!
+          </p>
+          <p style={{ fontSize: 'clamp(24px, 5vw, 32px)', lineHeight: '1.4', margin: 0, fontWeight: '500', textAlign: 'center' }}>
+            DRAW SOMETHING—ANYTHING!
+          </p>
+          
+          <div style={{ position: 'absolute', bottom: '24px', right: '24px' }}>
+            <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 30H50M50 30L35 15M50 30L35 45" stroke="#0066FF" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
           </div>
-          <button
-            onClick={handleRetry}
-            style={{
-              backgroundColor: '#0066FF',
-              color: '#fff',
-              padding: '12px 32px',
-              fontSize: '16px',
-              fontWeight: '500',
-              border: 'none',
-              cursor: 'pointer',
-              width: '100%',
-              fontFamily: 'Helvetica, Arial, sans-serif'
-            }}
-          >
-            BACK TO DRAWING
-          </button>
         </div>
       </div>
     );
