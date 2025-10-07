@@ -694,7 +694,7 @@ export default function Home() {
         <div style={{ 
           backgroundColor: '#000', 
           color: '#fff', 
-          padding: '90px 48px 80px 48px', 
+          padding: '90px 48px 96px 48px', 
           maxWidth: '600px', 
           width: '100%',
           position: 'relative'
@@ -706,10 +706,10 @@ export default function Home() {
             DRAW SOMETHING—ANYTHING!
           </p>
           <p style={{ fontSize: 'clamp(12px, 2.5vw, 16px)', lineHeight: '1.4', margin: 0, fontWeight: '400', textAlign: 'left' }}>
-            YOU CAN'T JUST SUBMIT AN EMPTY CANVAS
+            (YOU CAN'T JUST SUBMIT AN EMPTY CANVAS)
           </p>
           
-          <div style={{ position: 'absolute', bottom: '32px', right: '48px' }}>
+          <div style={{ position: 'absolute', bottom: '24px', right: '48px' }}>
             <svg width="120" height="60" viewBox="0 0 120 60" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M10 30H110M110 30L85 15M110 30L85 45" stroke="#0066FF" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
