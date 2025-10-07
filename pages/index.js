@@ -148,6 +148,22 @@ export default function Home() {
     initializeApp();
   }, []);
 
+  const handleAutoSubmit = async () => {
+    const coverage = calculateCoverage();
+    const drawingTime = firstStrokeTime ? (Date.now() - firstStrokeTime) / 1000 : 0;
+
+    if (coverage < MIN_COVERAGE) {
+      setErrorMessage('blank');
+      setScreen('error-validation');
+      setTimeLeft(TIMER_DURATION);
+      setStrokes([]);
+      setFirstStrokeTime(null);
+      return;
+    }
+
+    await submitDrawing(coverage, drawingTime);
+  };
+
   useEffect(() => {
       if (screen === 'drawing' && timeLeft > 0) {
         timerRef.current = setInterval(() => {
@@ -488,22 +504,6 @@ export default function Home() {
     await submitDrawing(coverage, drawingTime);
   };
   
-const handleAutoSubmit = useCallback(async () => {
-    const coverage = calculateCoverage();
-    const drawingTime = firstStrokeTime ? (Date.now() - firstStrokeTime) / 1000 : 0;
-
-    if (coverage < MIN_COVERAGE) {
-      setErrorMessage('blank');
-      setScreen('error-validation');
-      setTimeLeft(TIMER_DURATION);
-      setStrokes([]);
-      setFirstStrokeTime(null);
-      return;
-    }
-
-    await submitDrawing(coverage, drawingTime);
-  }, [firstStrokeTime, strokes, userId, promptIndex]);
-
   const submitDrawing = async (coverage, drawingTime) => {
     setIsSubmitting(true);
     setScreen('submitting');
