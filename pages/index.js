@@ -38,13 +38,51 @@ const getRandomPosition = (index, total) => {
   };
 };
 
-function GalleryDrawing({ drawing }) {
+function GalleryDrawing({ drawing, index, isInitialView, scrollDirection }) {
   const canvasRef = useRef(null);
-  const [isAnimating, setIsAnimating] = useState(true);
+  const containerRef = useRef(null);
+  const [isAnimating, setIsAnimating] = useState(false);
   const [hasAnimated, setHasAnimated] = useState(false);
+  const [shouldStart, setShouldStart] = useState(false);
 
   useEffect(() => {
-    if (!canvasRef.current || hasAnimated) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !hasAnimated) {
+            // Calculate delay based on whether it's initial view or scrolling
+            let delay = 0;
+            
+            if (isInitialView) {
+              // Initial load: longer stagger (500ms between each)
+              delay = index * 500;
+            } else {
+              // Scrolling: quick stagger (150ms between each)
+              delay = Math.random() * 300; // Random within 300ms for natural feel
+            }
+            
+            setTimeout(() => {
+              setShouldStart(true);
+            }, delay);
+          }
+        });
+      },
+      { threshold: 0.3 } // Start animating when 30% visible
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => {
+      if (containerRef.current) {
+        observer.unobserve(containerRef.current);
+      }
+    };
+  }, [hasAnimated, index, isInitialView]);
+
+  useEffect(() => {
+    if (!canvasRef.current || !shouldStart || hasAnimated) return;
     
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -79,6 +117,8 @@ function GalleryDrawing({ drawing }) {
     
     const originalSize = Math.max(maxX, maxY);
     const scale = originalSize > 0 ? 350 / originalSize : 1;
+    
+    setIsAnimating(true);
     
     let currentStrokeIndex = 0;
     let currentPointIndex = 0;
@@ -115,17 +155,21 @@ function GalleryDrawing({ drawing }) {
     };
     
     animateStrokes();
-  }, [drawing, hasAnimated]);
+  }, [drawing, hasAnimated, shouldStart]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      style={{
-        width: '100%',
-        height: '100%',
-        backgroundColor: '#F5F5DC'
-      }}
-    />
+    <div ref={containerRef} style={{ width: '100%', height: '100%' }}>
+      <canvas
+        ref={canvasRef}
+        style={{
+          width: '100%',
+          height: '100%',
+          backgroundColor: '#F5F5DC',
+          opacity: hasAnimated || isAnimating ? 1 : 0.3,
+          transition: 'opacity 0.3s ease-in'
+        }}
+      />
+    </div>
   );
 }
 
@@ -1024,7 +1068,7 @@ export default function Home() {
       );
     }
 
-    return (
+       return (
       <div style={{ minHeight: '100vh', backgroundColor: '#F5F5DC', fontFamily: 'Helvetica, Arial, sans-serif', overflow: 'auto', position: 'relative' }}>
         <div style={{ position: 'sticky', top: 0, backgroundColor: '#F5F5DC', padding: '40px 20px 20px', zIndex: 10 }}>
           <h1 style={{ fontSize: 'clamp(48px, 10vw, 72px)', fontWeight: 'bold', margin: '0 0 16px 0', textAlign: 'center' }}>
