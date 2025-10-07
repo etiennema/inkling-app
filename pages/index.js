@@ -44,7 +44,7 @@ const getRandomPosition = (index, total) => {
   };
 };
 
-function GalleryDrawing({ drawing, index, isInitialView, scrollDirection }) {
+function GalleryDrawing({ drawing, index, isUserDrawing }) {
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -52,40 +52,39 @@ function GalleryDrawing({ drawing, index, isInitialView, scrollDirection }) {
   const [shouldStart, setShouldStart] = useState(false);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && !hasAnimated) {
-            // Calculate delay based on whether it's initial view or scrolling
-            let delay = 0;
-            
-            if (isInitialView) {
-              // Initial load: longer stagger (500ms between each)
-              delay = index * 500;
-            } else {
-              // Scrolling: quick stagger
-              delay = Math.random() * 150; // Random within 150ms
-            }
-            
-            setTimeout(() => {
-              setShouldStart(true);
-            }, delay);
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && !hasAnimated) {
+          let delay = 0;
+          
+          if (isUserDrawing) {
+            // User's drawing: animate immediately
+            delay = 0;
+          } else {
+            // Other drawings: random quick stagger
+            delay = Math.random() * 300;
           }
-        });
-      },
-      { threshold: 0.3 } // Start animating when 30% visible
-    );
+          
+          setTimeout(() => {
+            setShouldStart(true);
+          }, delay);
+        }
+      });
+    },
+    { threshold: 0.3 }
+  );
 
+  if (containerRef.current) {
+    observer.observe(containerRef.current);
+  }
+
+  return () => {
     if (containerRef.current) {
-      observer.observe(containerRef.current);
+      observer.unobserve(containerRef.current);
     }
-
-    return () => {
-      if (containerRef.current) {
-        observer.unobserve(containerRef.current);
-      }
-    };
-  }, [hasAnimated, index, isInitialView]);
+  };
+}, [hasAnimated, isUserDrawing]);
 
   useEffect(() => {
     if (!canvasRef.current || !shouldStart || hasAnimated) return;
@@ -199,7 +198,6 @@ export default function Home() {
   const [submittingDots, setSubmittingDots] = useState(1);
   const [lastSubmittedImage, setLastSubmittedImage] = useState(null);
   const [galleryState, setGalleryState] = useState('loading');
-  const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 }); // ADD THIS
   
   const canvasRef = useRef(null);
   const timerRef = useRef(null); 
@@ -272,43 +270,6 @@ useEffect(() => {
   }, [screen, gallery, userId]);
 
   
-  // ADD THIS NEW useEffect:
-  useEffect(() => {
-    // Set initial viewport size
-    setViewportSize({
-      width: window.innerWidth,
-      height: window.innerHeight
-    });
-    
-    // Update viewport size on resize
-    const handleResize = () => {
-      setViewportSize({
-        width: window.innerWidth,
-        height: window.innerHeight
-      });
-    };
-    
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  // Center gallery scroll position on load
-  useEffect(() => {
-    if (screen === 'gallery' && galleryState === 'loaded') {
-      // Wait for DOM to render, then center scroll
-      setTimeout(() => {
-        const container = document.querySelector('[data-gallery-container]');
-        if (container) {
-          const scrollX = (container.scrollWidth - window.innerWidth) / 2;
-          const scrollY = 0;
-          container.scrollTo(scrollX, scrollY);
-        }
-      }, 100);
-    }
-  }, [screen, galleryState]);
-
-
-
   const initializeApp = async () => {
     try {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -416,20 +377,30 @@ useEffect(() => {
   };
 
   const loadGallery = async (pIndex) => {
-    try {
-      const { data, error } = await supabase
-        .from('submissions')
-        .select('id, image_url, stroke_data, submitted_at, user_id')
-        .eq('prompt_index', pIndex)
-        .order('submitted_at', { ascending: false });
+  try {
+    const { data, error } = await supabase
+      .from('submissions')
+      .select('id, image_url, stroke_data, submitted_at, user_id')
+      .eq('prompt_index', pIndex)
+      .order('submitted_at', { ascending: false });
 
-      if (error) throw error;
-      setGallery(data || []);
-    } catch (error) {
-      console.error('Gallery load error:', error);
-      setGalleryState('error');
+    if (error) throw error;
+    
+    // Sort so user's drawing is first, rest maintain order
+    const sortedData = data || [];
+    const userDrawingIndex = sortedData.findIndex(d => d.user_id === userId);
+    
+    if (userDrawingIndex > 0) {
+      const userDrawing = sortedData.splice(userDrawingIndex, 1)[0];
+      sortedData.unshift(userDrawing);
     }
-  };
+    
+    setGallery(sortedData);
+  } catch (error) {
+    console.error('Gallery load error:', error);
+    setGalleryState('error');
+  }
+};
 
   const handleStart = () => {
     if (screen === 'first-time') {
@@ -1013,158 +984,97 @@ useEffect(() => {
   }
 
   if (screen === 'gallery') {
-    if (galleryState === 'loading') {
-      return (
-        <div style={{ minHeight: '100vh', backgroundColor: '#F5F5DC', padding: '40px 20px', fontFamily: 'Helvetica, Arial, sans-serif' }}>
-          <h1 style={{ fontSize: 'clamp(48px, 10vw, 72px)', fontWeight: 'bold', margin: '0 0 16px 0', textAlign: 'center' }}>
+  if (galleryState === 'loading') {
+    return (
+      <div style={{ minHeight: '100vh', backgroundColor: '#F5F5DC', padding: '40px 20px', fontFamily: 'Helvetica, Arial, sans-serif' }}>
+        <h1 style={{ fontSize: 'clamp(48px, 10vw, 72px)', fontWeight: 'bold', margin: '0 0 16px 0', textAlign: 'center' }}>
+          GALLERY
+        </h1>
+        <p style={{ fontSize: 'clamp(16px, 3vw, 20px)', textAlign: 'center', margin: '0 0 60px 0' }}>
+          {formatDate()}
+        </p>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '40vh' }}>
+          <div style={{ fontSize: '48px', letterSpacing: '8px' }}>. . .</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (galleryState === 'error') {
+    return (
+      <div 
+        onClick={() => {
+          setGalleryState('loading');
+          loadGallery(promptIndex);
+        }}
+        style={{ 
+          minHeight: '100vh', 
+          backgroundColor: '#F5F5DC', 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          padding: '20px', 
+          fontFamily: 'Helvetica, Arial, sans-serif',
+          cursor: 'pointer'
+        }}
+      >
+        <div>
+          <h1 style={{ fontSize: 'clamp(48px, 10vw, 72px)', fontWeight: 'bold', margin: '0 0 16px 0', textAlign: 'center', position: 'absolute', top: '40px', left: 0, right: 0 }}>
             GALLERY
           </h1>
-          <p style={{ fontSize: 'clamp(16px, 3vw, 20px)', textAlign: 'center', margin: '0 0 60px 0' }}>
+          <p style={{ fontSize: 'clamp(16px, 3vw, 20px)', textAlign: 'center', position: 'absolute', top: '140px', left: 0, right: 0 }}>
             {formatDate()}
           </p>
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '40vh' }}>
-            <div style={{ fontSize: '48px', letterSpacing: '8px' }}>. . .</div>
-          </div>
         </div>
-      );
-    }
-
-    if (galleryState === 'error') {
-      return (
-        <div 
-          onClick={() => {
-            setGalleryState('loading');
-            loadGallery(promptIndex);
-          }}
-          style={{ 
-            minHeight: '100vh', 
-            backgroundColor: '#F5F5DC', 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center', 
-            padding: '20px', 
-            fontFamily: 'Helvetica, Arial, sans-serif',
-            cursor: 'pointer'
-          }}
-        >
-          <div>
-            <h1 style={{ fontSize: 'clamp(48px, 10vw, 72px)', fontWeight: 'bold', margin: '0 0 16px 0', textAlign: 'center', position: 'absolute', top: '40px', left: 0, right: 0 }}>
-              GALLERY
-            </h1>
-            <p style={{ fontSize: 'clamp(16px, 3vw, 20px)', textAlign: 'center', position: 'absolute', top: '140px', left: 0, right: 0 }}>
-              {formatDate()}
-            </p>
-          </div>
-          
-          <div style={{ 
-            backgroundColor: '#000', 
-            color: '#fff', 
-            padding: '60px 48px', 
-            maxWidth: '600px', 
-            width: '100%',
-            position: 'relative'
-          }}>
-            <p style={{ fontSize: 'clamp(20px, 4vw, 24px)', lineHeight: '1.4', margin: '0 0 24px 0', fontWeight: '500', textAlign: 'left' }}>
-              COULDN'T LOAD GALLERY.
-            </p>
-            <p style={{ fontSize: 'clamp(20px, 4vw, 24px)', lineHeight: '1.4', margin: 0, fontWeight: '500', textAlign: 'left' }}>
-              CHECK YOUR CONNECTION AND TRY AGAIN.
-            </p>
-            
-            <div style={{ position: 'absolute', bottom: '32px', left: '32px' }}>
-              <svg width="165" height="83" viewBox="0 0 165 83" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M14 41.5H137.5M137.5 41.5L110 27.5M137.5 41.5L110 55.5" stroke="#0066FF" strokeWidth="5.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    if (galleryState === 'first') {
-      const userDrawing = gallery[0];
-      return (
-        <div style={{ minHeight: '100vh', backgroundColor: '#F5F5DC', padding: '40px 20px', fontFamily: 'Helvetica, Arial, sans-serif', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <h1 style={{ fontSize: 'clamp(48px, 10vw, 72px)', fontWeight: 'bold', margin: '0 0 16px 0', textAlign: 'center' }}>
-            GALLERY
-          </h1>
-          <p style={{ fontSize: 'clamp(16px, 3vw, 20px)', textAlign: 'center', margin: '0 0 60px 0' }}>
-            {formatDate()}
+        
+        <div style={{ 
+          backgroundColor: '#000', 
+          color: '#fff', 
+          padding: '60px 48px', 
+          maxWidth: '600px', 
+          width: '100%',
+          position: 'relative'
+        }}>
+          <p style={{ fontSize: 'clamp(20px, 4vw, 24px)', lineHeight: '1.4', margin: '0 0 24px 0', fontWeight: '500', textAlign: 'left' }}>
+            COULDN'T LOAD GALLERY.
+          </p>
+          <p style={{ fontSize: 'clamp(20px, 4vw, 24px)', lineHeight: '1.4', margin: 0, fontWeight: '500', textAlign: 'left' }}>
+            CHECK YOUR CONNECTION AND TRY AGAIN.
           </p>
           
-          <div style={{ marginBottom: '40px', maxWidth: '400px', width: '100%', aspectRatio: '1/1' }}>
-            <GalleryDrawing drawing={userDrawing} />
-          </div>
-          
-          <p style={{ fontSize: 'clamp(18px, 4vw, 24px)', textAlign: 'center', margin: '0 0 80px 0', lineHeight: '1.4', maxWidth: '500px' }}>
-            YOU'RE FIRST TODAY!<br />
-            COME BACK IN A BIT TO SEE SOME OTHER CREATIONS.
-          </p>
-          
-          <div 
-            onClick={() => setScreen('already-done')}
-            style={{ cursor: 'pointer', marginTop: 'auto' }}
-          >
+          <div style={{ position: 'absolute', bottom: '32px', left: '32px' }}>
             <svg width="165" height="83" viewBox="0 0 165 83" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M14 41.5H137.5M137.5 41.5L110 27.5M137.5 41.5L110 55.5" stroke="#0066FF" strokeWidth="5.5" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
         </div>
-      );
-    }
-
-       return (
-      <div style={{ height: '100vh', backgroundColor: '#F5F5DC', fontFamily: 'Helvetica, Arial, sans-serif', overflow: 'scroll', position: 'relative' }}>
-        <div style={{ position: 'sticky', top: 0, backgroundColor: '#F5F5DC', padding: '40px 20px 20px', zIndex: 10 }}>
-          <h1 style={{ fontSize: 'clamp(48px, 10vw, 72px)', fontWeight: 'bold', margin: '0 0 16px 0', textAlign: 'center' }}>
-            GALLERY
-          </h1>
-          <p style={{ fontSize: 'clamp(16px, 3vw, 20px)', textAlign: 'center', margin: 0 }}>
-            {formatDate()}
-          </p>
-        </div>
-        
-      <div data-gallery-container style={{ position: 'relative', minHeight: '150vh', minWidth: '200vw', padding: '0 20px 20px 20px' }}>
-  
-  {gallery.map((item, index) => {
-    const pos = getRandomPosition(index, gallery.length);
-    // Determine if this is in initial viewport - limit to first 6 drawings within viewport
-    const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 800;
-    const viewportHeight = typeof window !== 'undefined' ? window.innerHeight : 600;
-    const isInitialView = index < 6 && pos.left > -350 && pos.left < viewportWidth && pos.top < viewportHeight;
-    
-    return (
-      <div
-        key={item.id}
-        style={{
-          position: 'absolute',
-          left: `calc(50% + ${pos.left}px)`,
-          top: `calc(50% + ${pos.top}px)`,
-          transform: `translate(-50%, -50%) rotate(${pos.rotation}deg)`,
-          width: '350px',
-          height: '350px'
-        }}
-      >
-        <GalleryDrawing 
-          drawing={item} 
-          index={index}
-          isInitialView={isInitialView}
-        />
       </div>
     );
-  })}
-</div>
+  }
+
+  if (galleryState === 'first') {
+    const userDrawing = gallery[0];
+    return (
+      <div style={{ minHeight: '100vh', backgroundColor: '#F5F5DC', padding: '40px 20px', fontFamily: 'Helvetica, Arial, sans-serif', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <h1 style={{ fontSize: 'clamp(48px, 10vw, 72px)', fontWeight: 'bold', margin: '0 0 16px 0', textAlign: 'center' }}>
+          GALLERY
+        </h1>
+        <p style={{ fontSize: 'clamp(16px, 3vw, 20px)', textAlign: 'center', margin: '0 0 60px 0' }}>
+          {formatDate()}
+        </p>
+        
+        <div style={{ marginBottom: '40px', maxWidth: '400px', width: '100%', aspectRatio: '1/1' }}>
+          <GalleryDrawing drawing={userDrawing} index={0} isUserDrawing={true} />
+        </div>
+        
+        <p style={{ fontSize: 'clamp(18px, 4vw, 24px)', textAlign: 'center', margin: '0 0 80px 0', lineHeight: '1.4', maxWidth: '500px' }}>
+          YOU'RE FIRST TODAY!<br />
+          COME BACK IN A BIT TO SEE SOME OTHER CREATIONS.
+        </p>
         
         <div 
           onClick={() => setScreen('already-done')}
-          style={{ 
-            position: 'fixed', 
-            bottom: '40px', 
-            left: '50%', 
-            transform: 'translateX(-50%)',
-            cursor: 'pointer',
-            zIndex: 20
-          }}
+          style={{ cursor: 'pointer', marginTop: 'auto' }}
         >
           <svg width="165" height="83" viewBox="0 0 165 83" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M14 41.5H137.5M137.5 41.5L110 27.5M137.5 41.5L110 55.5" stroke="#0066FF" strokeWidth="5.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -1174,5 +1084,98 @@ useEffect(() => {
     );
   }
 
-  return null;
+  // Calculate gallery container dimensions based on drawing positions
+  const positions = gallery.map((_, index) => getRandomPosition(index, gallery.length));
+  
+  const minX = Math.min(...positions.map(p => p.left)) - 400;
+  const maxX = Math.max(...positions.map(p => p.left)) + 400;
+  const minY = Math.min(...positions.map(p => p.top)) - 400;
+  const maxY = Math.max(...positions.map(p => p.top)) + 400;
+  
+  const containerWidth = maxX - minX + 700; // +700 for drawing size
+  const containerHeight = maxY - minY + 700;
+  
+  // User's drawing is always at index 0 now
+  const userDrawingPos = positions[0];
+
+  return (
+    <div style={{ height: '100vh', backgroundColor: '#F5F5DC', fontFamily: 'Helvetica, Arial, sans-serif', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+      {/* Header - scrolls with content */}
+      <div style={{ padding: '40px 20px 20px', flexShrink: 0 }}>
+        <h1 style={{ fontSize: 'clamp(48px, 10vw, 72px)', fontWeight: 'bold', margin: '0 0 16px 0', textAlign: 'center' }}>
+          GALLERY
+        </h1>
+        <p style={{ fontSize: 'clamp(16px, 3vw, 20px)', textAlign: 'center', margin: 0 }}>
+          {formatDate()}
+        </p>
+      </div>
+      
+      {/* Scrollable gallery container */}
+      <div 
+        data-gallery-container
+        ref={(el) => {
+          if (el && galleryState === 'loaded') {
+            // Center on user's drawing on mount
+            const scrollX = userDrawingPos.left - minX + (containerWidth / 2) - (window.innerWidth / 2);
+            const scrollY = userDrawingPos.top - minY + (containerHeight / 2) - ((window.innerHeight - 150) / 2); // 150 = approx header height
+            el.scrollTo(scrollX, scrollY);
+          }
+        }}
+        style={{ 
+          flex: 1,
+          overflow: 'auto',
+          position: 'relative'
+        }}
+      >
+        <div style={{ 
+          position: 'relative', 
+          width: `${containerWidth}px`, 
+          height: `${containerHeight}px`,
+          minHeight: '100%'
+        }}>
+          {gallery.map((item, index) => {
+            const pos = positions[index];
+            const isUserDrawing = index === 0; // User's drawing is always first now
+            
+            return (
+              <div
+                key={item.id}
+                style={{
+                  position: 'absolute',
+                  left: `${pos.left - minX + (containerWidth / 2)}px`,
+                  top: `${pos.top - minY + (containerHeight / 2)}px`,
+                  transform: `translate(-50%, -50%) rotate(${pos.rotation}deg)`,
+                  width: '350px',
+                  height: '350px'
+                }}
+              >
+                <GalleryDrawing 
+                  drawing={item} 
+                  index={index}
+                  isUserDrawing={isUserDrawing}
+                />
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      
+      {/* Fixed back button */}
+      <div 
+        onClick={() => setScreen('already-done')}
+        style={{ 
+          position: 'fixed', 
+          bottom: '40px', 
+          left: '50%', 
+          transform: 'translateX(-50%)',
+          cursor: 'pointer',
+          zIndex: 20
+        }}
+      >
+        <svg width="165" height="83" viewBox="0 0 165 83" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M14 41.5H137.5M137.5 41.5L110 27.5M137.5 41.5L110 55.5" stroke="#0066FF" strokeWidth="5.5" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </div>
+    </div>
+  );
 }
