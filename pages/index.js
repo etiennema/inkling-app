@@ -25,7 +25,7 @@ const getRandomPosition = (index, total) => {
   const col = index % columns;
   
   const baseX = (col * 400) + 100;
-  const baseY = (row * 400) + 300;
+  const baseY = (row * 400) + 50; // Change 300 to 50
   
   const randomX = (Math.random() - 0.5) * 100;
   const randomY = (Math.random() - 0.5) * 100;
@@ -67,8 +67,18 @@ function GalleryDrawing({ drawing }) {
       return;
     }
     
-    const totalDuration = 2000;
-    const durationPerStroke = totalDuration / strokes.length;
+    // Find max coordinates to calculate scale
+    let maxX = 0;
+    let maxY = 0;
+    strokes.forEach(stroke => {
+      stroke.points.forEach(point => {
+        if (point.x > maxX) maxX = point.x;
+        if (point.y > maxY) maxY = point.y;
+      });
+    });
+    
+    const originalSize = Math.max(maxX, maxY);
+    const scale = originalSize > 0 ? 350 / originalSize : 1;
     
     let currentStrokeIndex = 0;
     let currentPointIndex = 0;
@@ -85,18 +95,18 @@ function GalleryDrawing({ drawing }) {
       
       if (currentPointIndex === 0) {
         ctx.beginPath();
-        ctx.moveTo(points[0].x, points[0].y);
+        ctx.moveTo(points[0].x * scale, points[0].y * scale);
         ctx.strokeStyle = stroke.color;
-        ctx.lineWidth = 5;
+        ctx.lineWidth = 5 * scale;
       }
       
       if (currentPointIndex < points.length) {
         const point = points[currentPointIndex];
-        ctx.lineTo(point.x, point.y);
+        ctx.lineTo(point.x * scale, point.y * scale);
         ctx.stroke();
         currentPointIndex++;
         
-        setTimeout(animateStrokes, 10 / 1.5);
+        setTimeout(animateStrokes, 10 / 1.25);
       } else {
         currentStrokeIndex++;
         currentPointIndex = 0;
@@ -111,7 +121,6 @@ function GalleryDrawing({ drawing }) {
     <canvas
       ref={canvasRef}
       style={{
-        border: '2px solid #000',
         width: '100%',
         height: '100%',
         backgroundColor: '#F5F5DC'
@@ -1026,26 +1035,26 @@ export default function Home() {
           </p>
         </div>
         
-        <div style={{ position: 'relative', minHeight: '200vh', padding: '20px' }}>
-          {gallery.map((item, index) => {
-            const pos = getRandomPosition(index, gallery.length);
-            return (
-              <div
-                key={item.id}
-                style={{
-                  position: 'absolute',
-                  left: `${pos.left}px`,
-                  top: `${pos.top}px`,
-                  transform: `rotate(${pos.rotation}deg)`,
-                  width: '350px',
-                  height: '350px'
-                }}
-              >
-                <GalleryDrawing drawing={item} />
-              </div>
-            );
-          })}
-        </div>
+       <div style={{ position: 'relative', minHeight: '150vh', minWidth: '200vw', padding: '0 20px 20px 20px' }}>
+  {gallery.map((item, index) => {
+    const pos = getRandomPosition(index, gallery.length);
+    return (
+      <div
+        key={item.id}
+        style={{
+          position: 'absolute',
+          left: `${pos.left}px`,
+          top: `${pos.top}px`,
+          transform: `rotate(${pos.rotation}deg)`,
+          width: '350px',
+          height: '350px'
+        }}
+      >
+        <GalleryDrawing drawing={item} />
+      </div>
+    );
+  })}
+</div>
         
         <div 
           onClick={() => setScreen('already-done')}
