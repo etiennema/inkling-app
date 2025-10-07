@@ -63,8 +63,8 @@ function GalleryDrawing({ drawing, index, isInitialView, scrollDirection }) {
               // Initial load: longer stagger (500ms between each)
               delay = index * 500;
             } else {
-              // Scrolling: quick stagger (150ms between each)
-              delay = Math.random() * 300; // Random within 300ms for natural feel
+              // Scrolling: quick stagger
+              delay = Math.random() * 150; // Random within 150ms
             }
             
             setTimeout(() => {
@@ -271,6 +271,7 @@ useEffect(() => {
     }
   }, [screen, gallery, userId]);
 
+  
   // ADD THIS NEW useEffect:
   useEffect(() => {
     // Set initial viewport size
@@ -290,6 +291,23 @@ useEffect(() => {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Center gallery scroll position on load
+  useEffect(() => {
+    if (screen === 'gallery' && galleryState === 'loaded') {
+      // Wait for DOM to render, then center scroll
+      setTimeout(() => {
+        const container = document.querySelector('[data-gallery-container]');
+        if (container) {
+          const scrollX = (container.scrollWidth - window.innerWidth) / 2;
+          const scrollY = 0;
+          container.scrollTo(scrollX, scrollY);
+        }
+      }, 100);
+    }
+  }, [screen, galleryState]);
+
+
 
   const initializeApp = async () => {
     try {
@@ -1096,7 +1114,7 @@ useEffect(() => {
     }
 
        return (
-      <div style={{ minHeight: '100vh', backgroundColor: '#F5F5DC', fontFamily: 'Helvetica, Arial, sans-serif', overflow: 'auto', position: 'relative' }}>
+      <div style={{ height: '100vh', backgroundColor: '#F5F5DC', fontFamily: 'Helvetica, Arial, sans-serif', overflow: 'scroll', position: 'relative' }}>
         <div style={{ position: 'sticky', top: 0, backgroundColor: '#F5F5DC', padding: '40px 20px 20px', zIndex: 10 }}>
           <h1 style={{ fontSize: 'clamp(48px, 10vw, 72px)', fontWeight: 'bold', margin: '0 0 16px 0', textAlign: 'center' }}>
             GALLERY
@@ -1106,14 +1124,14 @@ useEffect(() => {
           </p>
         </div>
         
-       <div style={{ position: 'relative', minHeight: '200vh', minWidth: '200vw', padding: '100px' }}>
+      <div data-gallery-container style={{ position: 'relative', minHeight: '150vh', minWidth: '200vw', padding: '0 20px 20px 20px' }}>
+  
   {gallery.map((item, index) => {
     const pos = getRandomPosition(index, gallery.length);
-    
-    // Dynamic viewport detection based on actual window size
-    const isInitialView = 
-      Math.abs(pos.left) < viewportSize.width * 0.8 && 
-      Math.abs(pos.top) < viewportSize.height * 0.8;
+    // Determine if this is in initial viewport - limit to first 6 drawings within viewport
+    const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 800;
+    const viewportHeight = typeof window !== 'undefined' ? window.innerHeight : 600;
+    const isInitialView = index < 6 && pos.left > -350 && pos.left < viewportWidth && pos.top < viewportHeight;
     
     return (
       <div
