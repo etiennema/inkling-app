@@ -1114,14 +1114,13 @@ useEffect(() => {
       <div 
         data-gallery-container
         ref={(el) => {
-              ref={(el) => {
-        if (el && galleryState === 'loaded') {
-          // Center on user's drawing horizontally, start at top vertically
-          const scrollX = (userDrawingPos.left - minX) - (window.innerWidth / 2) + 175; // 175 = half of drawing width
-          const scrollY = 0;
-          el.scrollTo(scrollX, scrollY);
-        }
-      }}
+            if (el && galleryState === 'loaded') {
+              // Center on user's drawing horizontally, start at top vertically
+              const scrollX = (userDrawingPos.left - minX) - (window.innerWidth / 2) + 175; // 175 = half of drawing width
+              const scrollY = 0;
+              el.scrollTo(scrollX, scrollY);
+            }
+          }}
         style={{ 
           flex: 1,
           overflow: 'auto',
