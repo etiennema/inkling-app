@@ -30,6 +30,7 @@ export default function Home() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [countdown, setCountdown] = useState('');
   const [submittingDots, setSubmittingDots] = useState(1);
+  const [lastSubmittedImage, setLastSubmittedImage] = useState(null);
   
   const canvasRef = useRef(null);
   const timerRef = useRef(null);
@@ -416,8 +417,9 @@ export default function Home() {
 
       if (insertError) throw insertError;
 
-      setSubmissionCount(prev => prev + 1);
-      await loadGallery(promptIndex);
+        setLastSubmittedImage(publicUrl);
+        setSubmissionCount(prev => prev + 1);
+        await loadGallery(promptIndex);
 
       const dotInterval = setInterval(() => {
         setSubmittingDots(prev => prev === 3 ? 1 : prev + 1);
@@ -739,15 +741,18 @@ if (screen === 'error-validation') {
         </h1>
         
         <div style={{ marginBottom: '40px', maxWidth: '400px', width: '100%', aspectRatio: '1/1' }}>
-          <canvas
-            ref={canvasRef}
-            style={{
-              border: '2px solid #000',
-              width: '100%',
-              height: '100%',
-              pointerEvents: 'none'
-            }}
-          />
+          {lastSubmittedImage && (
+            <img
+              src={lastSubmittedImage}
+              alt="Your drawing"
+              style={{
+                border: '2px solid #000',
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover'
+              }}
+            />
+          )}
         </div>
         
         <p style={{ fontSize: 'clamp(18px, 4vw, 24px)', textAlign: 'center', margin: '0 0 60px 0', lineHeight: '1.4' }}>
