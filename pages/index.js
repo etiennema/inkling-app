@@ -21,11 +21,17 @@ const formatDate = () => {
 
 const getRandomPosition = (index, total) => {
   const columns = Math.ceil(Math.sqrt(total * 1.5));
+  const rows = Math.ceil(total / columns);
+  
   const row = Math.floor(index / columns);
   const col = index % columns;
   
-  const baseX = (col * 400) + 100;
-  const baseY = (row * 400) + 50; // Change 300 to 50
+  // Center the grid by offsetting by half the total width/height
+  const centerOffsetX = (columns * 400) / 2;
+  const centerOffsetY = (rows * 400) / 2;
+  
+  const baseX = (col * 400) - centerOffsetX + 200; // +200 for padding
+  const baseY = (row * 400) - centerOffsetY + 200;
   
   const randomX = (Math.random() - 0.5) * 100;
   const randomY = (Math.random() - 0.5) * 100;
@@ -193,6 +199,11 @@ export default function Home() {
   const [submittingDots, setSubmittingDots] = useState(1);
   const [lastSubmittedImage, setLastSubmittedImage] = useState(null);
   const [galleryState, setGalleryState] = useState('loading');
+  const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 }); // ADD THIS
+  
+  const canvasRef = useRef(null);
+  const timerRef = useRef(null);  const [lastSubmittedImage, setLastSubmittedImage] = useState(null);
+  const [galleryState, setGalleryState] = useState('loading');
   
   const canvasRef = useRef(null);
   const timerRef = useRef(null);
@@ -252,7 +263,39 @@ export default function Home() {
     }
   }, [screen]);
 
+useEffect(() => {
+    if (screen === 'gallery') {
+      if (gallery.length === 0) {
+        setGalleryState('loading');
+      } else if (gallery.length === 1 && gallery[0].user_id === userId) {
+        setGalleryState('first');
+      } else {
+        setGalleryState('loaded');
+      }
+    }
+  }, [screen, gallery, userId]);
+
+  // ADD THIS NEW useEffect:
   useEffect(() => {
+    // Set initial viewport size
+    setViewportSize({
+      width: window.innerWidth,
+      height: window.innerHeight
+    });
+    
+    // Update viewport size on resize
+    const handleResize = () => {
+      setViewportSize({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const initializeApp = async () => {
     if (screen === 'gallery') {
       if (gallery.length === 0) {
         setGalleryState('loading');
@@ -1079,22 +1122,32 @@ export default function Home() {
           </p>
         </div>
         
-       <div style={{ position: 'relative', minHeight: '150vh', minWidth: '200vw', padding: '0 20px 20px 20px' }}>
+       <div style={{ position: 'relative', minHeight: '200vh', minWidth: '200vw', padding: '100px' }}>
   {gallery.map((item, index) => {
     const pos = getRandomPosition(index, gallery.length);
+    
+    // Dynamic viewport detection based on actual window size
+    const isInitialView = 
+      Math.abs(pos.left) < viewportSize.width * 0.8 && 
+      Math.abs(pos.top) < viewportSize.height * 0.8;
+    
     return (
       <div
         key={item.id}
         style={{
           position: 'absolute',
-          left: `${pos.left}px`,
-          top: `${pos.top}px`,
-          transform: `rotate(${pos.rotation}deg)`,
+          left: `calc(50% + ${pos.left}px)`,
+          top: `calc(50% + ${pos.top}px)`,
+          transform: `translate(-50%, -50%) rotate(${pos.rotation}deg)`,
           width: '350px',
           height: '350px'
         }}
       >
-        <GalleryDrawing drawing={item} />
+        <GalleryDrawing 
+          drawing={item} 
+          index={index}
+          isInitialView={isInitialView}
+        />
       </div>
     );
   })}
