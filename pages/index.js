@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
@@ -9,7 +9,7 @@ const supabase = createClient(
 const COLORS = ['#000000', '#0066FF', '#FF0000', '#00CC00', '#FFCC00'];
 const BRUSH_SIZE = 5;
 const TIMER_DURATION = 60;
-const MIN_COVERAGE = 0.3;
+const MIN_COVERAGE = 0.003;
 const MIN_TIME = 3;
 
 // Helper functions
@@ -149,26 +149,26 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (screen === 'drawing' && timeLeft > 0) {
-      timerRef.current = setInterval(() => {
-        setTimeLeft(prev => {
-          if (prev <= 1) {
-            handleAutoSubmit();
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
+      if (screen === 'drawing' && timeLeft > 0) {
+        timerRef.current = setInterval(() => {
+          setTimeLeft(prev => {
+            if (prev <= 1) {
+              handleAutoSubmit();
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
 
-      return () => {
-        if (timerRef.current) {
-          clearInterval(timerRef.current);
-        }
-      };
-    } else if (timerRef.current) {
-      clearInterval(timerRef.current);
-    }
-  }, [screen, timeLeft]);
+        return () => {
+          if (timerRef.current) {
+            clearInterval(timerRef.current);
+          }
+        };
+      } else if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    }, [screen, timeLeft, handleAutoSubmit]);
 
   useEffect(() => {
     if (screen === 'already-done') {
@@ -487,8 +487,8 @@ export default function Home() {
 
     await submitDrawing(coverage, drawingTime);
   };
-
-  const handleAutoSubmit = async () => {
+  
+const handleAutoSubmit = useCallback(async () => {
     const coverage = calculateCoverage();
     const drawingTime = firstStrokeTime ? (Date.now() - firstStrokeTime) / 1000 : 0;
 
@@ -502,7 +502,7 @@ export default function Home() {
     }
 
     await submitDrawing(coverage, drawingTime);
-  };
+  }, [firstStrokeTime, strokes, userId, promptIndex]);
 
   const submitDrawing = async (coverage, drawingTime) => {
     setIsSubmitting(true);
