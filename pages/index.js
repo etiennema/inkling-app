@@ -676,7 +676,7 @@ export default function Home() {
     );
   }
 
- if (screen === 'error-validation') {
+if (screen === 'error-validation') {
     return (
       <div 
         onClick={handleRetry}
@@ -694,7 +694,7 @@ export default function Home() {
         <div style={{ 
           backgroundColor: '#000', 
           color: '#fff', 
-          padding: '112px 48px 120px 48px', 
+          padding: '112px 48px 140px 48px', 
           maxWidth: '600px', 
           width: '100%',
           position: 'relative'
@@ -709,7 +709,7 @@ export default function Home() {
             (YOU CAN'T JUST SUBMIT AN EMPTY CANVAS)
           </p>
           
-          <div style={{ position: 'absolute', bottom: '48px', left: '48px' }}>
+          <div style={{ position: 'absolute', bottom: '32px', left: '68px' }}>
             <svg width="120" height="60" viewBox="0 0 120 60" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M10 30H100M100 30L80 20M100 30L80 40" stroke="#0066FF" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
