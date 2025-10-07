@@ -709,9 +709,9 @@ export default function Home() {
             (YOU CAN'T JUST SUBMIT AN EMPTY CANVAS)
           </p>
           
-          <div style={{ position: 'absolute', bottom: '40px', right: '48px' }}>
+          <div style={{ position: 'absolute', bottom: '48px', left: '48px' }}>
             <svg width="120" height="60" viewBox="0 0 120 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M10 30H110M110 30L85 15M110 30L85 45" stroke="#0066FF" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M10 30H100M100 30L80 20M100 30L80 40" stroke="#0066FF" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
         </div>
