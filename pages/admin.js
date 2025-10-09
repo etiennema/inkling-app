@@ -1,0 +1,287 @@
+import { useState, useEffect } from 'react';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+);
+
+const ADMIN_PASSWORD = 'inkling2025';
+
+export default function Admin() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [password, setPassword] = useState('');
+  const [submissions, setSubmissions] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [deletingId, setDeletingId] = useState(null);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadSubmissions();
+    }
+  }, [isAuthenticated]);
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    if (password === ADMIN_PASSWORD) {
+      setIsAuthenticated(true);
+      setError('');
+    } else {
+      setError('Incorrect password');
+    }
+  };
+
+  const loadSubmissions = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('submissions')
+        .select('*')
+        .order('submitted_at', { ascending: false });
+
+      if (error) throw error;
+      setSubmissions(data || []);
+    } catch (err) {
+      console.error('Error loading submissions:', err);
+      setError('Failed to load submissions');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (submission) => {
+    if (!confirm(`Delete this submission from "${submission.prompt_index}"?`)) {
+      return;
+    }
+
+    setDeletingId(submission.id);
+    try {
+      // Extract filename from URL
+      const url = submission.image_url;
+      const filename = url.split('/').pop().split('?')[0];
+
+      // Delete from storage
+      const { error: storageError } = await supabase.storage
+        .from('drawings')
+        .remove([filename]);
+
+      if (storageError) {
+        console.error('Storage deletion error:', storageError);
+      }
+
+      // Delete from database
+      const { error: dbError } = await supabase
+        .from('submissions')
+        .delete()
+        .eq('id', submission.id);
+
+      if (dbError) throw dbError;
+
+      // Remove from local state
+      setSubmissions(prev => prev.filter(s => s.id !== submission.id));
+      alert('Submission deleted successfully');
+    } catch (err) {
+      console.error('Error deleting submission:', err);
+      alert('Failed to delete submission');
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric', 
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  // Login screen
+  if (!isAuthenticated) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        backgroundColor: '#F5F5DC',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontFamily: 'Helvetica, Arial, sans-serif',
+        padding: '20px'
+      }}>
+        <div style={{ maxWidth: '400px', width: '100%' }}>
+          <h1 style={{ 
+            fontSize: '48px', 
+            fontWeight: 'bold', 
+            marginBottom: '40px',
+            textAlign: 'center'
+          }}>
+            ADMIN
+          </h1>
+          <form onSubmit={handleLogin}>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter password"
+              style={{
+                width: '100%',
+                padding: '16px',
+                fontSize: '16px',
+                border: '2px solid #000',
+                marginBottom: '16px',
+                fontFamily: 'Helvetica, Arial, sans-serif',
+                boxSizing: 'border-box'
+              }}
+            />
+            {error && (
+              <p style={{ color: 'red', marginBottom: '16px' }}>{error}</p>
+            )}
+            <button
+              type="submit"
+              style={{
+                width: '100%',
+                padding: '16px',
+                fontSize: '16px',
+                backgroundColor: '#0066FF',
+                color: '#fff',
+                border: 'none',
+                cursor: 'pointer',
+                fontFamily: 'Helvetica, Arial, sans-serif',
+                fontWeight: '500'
+              }}
+            >
+              LOGIN
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  // Admin dashboard
+  return (
+    <div style={{
+      minHeight: '100vh',
+      backgroundColor: '#F5F5DC',
+      fontFamily: 'Helvetica, Arial, sans-serif',
+      padding: '40px 20px'
+    }}>
+      <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          marginBottom: '40px'
+        }}>
+          <h1 style={{ fontSize: '48px', fontWeight: 'bold', margin: 0 }}>
+            ADMIN
+          </h1>
+          <div>
+            <button
+              onClick={loadSubmissions}
+              style={{
+                padding: '12px 24px',
+                fontSize: '14px',
+                backgroundColor: '#0066FF',
+                color: '#fff',
+                border: 'none',
+                cursor: 'pointer',
+                marginRight: '12px',
+                fontFamily: 'Helvetica, Arial, sans-serif'
+              }}
+            >
+              REFRESH
+            </button>
+            <button
+              onClick={() => setIsAuthenticated(false)}
+              style={{
+                padding: '12px 24px',
+                fontSize: '14px',
+                backgroundColor: '#000',
+                color: '#fff',
+                border: 'none',
+                cursor: 'pointer',
+                fontFamily: 'Helvetica, Arial, sans-serif'
+              }}
+            >
+              LOGOUT
+            </button>
+          </div>
+        </div>
+
+        <p style={{ marginBottom: '40px', fontSize: '18px' }}>
+          Total submissions: <strong>{submissions.length}</strong>
+        </p>
+
+        {loading ? (
+          <p style={{ fontSize: '24px', textAlign: 'center' }}>Loading...</p>
+        ) : (
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+            gap: '24px'
+          }}>
+            {submissions.map(submission => (
+              <div
+                key={submission.id}
+                style={{
+                  border: '2px solid #000',
+                  padding: '16px',
+                  backgroundColor: '#fff'
+                }}
+              >
+                <img
+                  src={submission.image_url}
+                  alt="Submission"
+                  style={{
+                    width: '100%',
+                    aspectRatio: '1/1',
+                    objectFit: 'cover',
+                    marginBottom: '12px',
+                    border: '1px solid #ddd'
+                  }}
+                />
+                <p style={{ margin: '0 0 8px 0', fontSize: '14px' }}>
+                  <strong>Prompt #{submission.prompt_index}</strong>
+                </p>
+                <p style={{ margin: '0 0 8px 0', fontSize: '12px', color: '#666' }}>
+                  {formatDate(submission.submitted_at)}
+                </p>
+                <p style={{ margin: '0 0 16px 0', fontSize: '12px', color: '#666' }}>
+                  User: {submission.user_id.substring(0, 8)}...
+                </p>
+                <button
+                  onClick={() => handleDelete(submission)}
+                  disabled={deletingId === submission.id}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    fontSize: '14px',
+                    backgroundColor: deletingId === submission.id ? '#ccc' : '#FF0000',
+                    color: '#fff',
+                    border: 'none',
+                    cursor: deletingId === submission.id ? 'not-allowed' : 'pointer',
+                    fontFamily: 'Helvetica, Arial, sans-serif',
+                    fontWeight: '500'
+                  }}
+                >
+                  {deletingId === submission.id ? 'DELETING...' : 'DELETE'}
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {!loading && submissions.length === 0 && (
+          <p style={{ textAlign: 'center', fontSize: '18px', marginTop: '60px' }}>
+            No submissions yet.
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
