@@ -1119,8 +1119,8 @@ const containerHeight = (maxY - minY) + drawingSize + topMargin + padding;
 
 // Calculate offsets - user at (0,0) should end up centered horizontally and at topMargin vertically
 const horizontalCenter = containerWidth / 2;
-const offsetX = horizontalCenter - minX; // Shift so minX is at left edge (with drawing size accounted for)
-const offsetY = topMargin - minY; // Shift so minY starts at topMargin
+const offsetX = -minX + padding + (drawingSize / 2);
+const offsetY = -minY + topMargin;
 
 // Calculate final positions
 const finalPositions = positions.map(pos => ({
