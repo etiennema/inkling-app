@@ -22,7 +22,7 @@ const formatDate = () => {
 const getRandomPosition = (index, total) => {
   const columns = Math.ceil(Math.sqrt(total * 1.5));
   const rows = Math.ceil(total / columns);
-  
+
   const row = Math.floor(index / columns);
   const col = index % columns;
   
@@ -1095,6 +1095,15 @@ const minX = Math.min(...positions.map(p => p.left));
 const maxX = Math.max(...positions.map(p => p.left));
 const minY = Math.min(...positions.map(p => p.top));
 const maxY = Math.max(...positions.map(p => p.top));
+
+
+// ADD CONSOLE LOGS HERE:
+  console.log('User drawing position:', userDrawingPos);
+  console.log('Min/Max X:', minX, maxX);
+  console.log('Min/Max Y:', minY, maxY);
+  console.log('Container size:', containerWidth, containerHeight);
+  console.log('User final position:', userFinalPos);
+  
 
 // Calculate how much we need to offset to put user's drawing near top
 const headerHeight = 200; // Space for header + breathing room
