@@ -930,7 +930,8 @@ useEffect(() => {
       <div 
         onClick={() => setScreen('gallery')}
         style={{ 
-          minHeight: '100vh', 
+          height: '100vh',
+          minHeight: '-webkit-fill-available',
           backgroundColor: '#F5F5DC', 
           display: 'flex', 
           flexDirection: 'column',
@@ -939,7 +940,14 @@ useEffect(() => {
           padding: '40px 20px', 
           fontFamily: 'Helvetica, Arial, sans-serif',
           cursor: 'pointer',
-          position: 'relative'
+          position: 'relative',
+          overflow: 'hidden',
+          boxSizing: 'border-box',
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0
         }}
       >
         <h1 style={{ fontSize: 'clamp(48px, 10vw, 72px)', fontWeight: 'bold', margin: '0 0 60px 0', textAlign: 'center' }}>
