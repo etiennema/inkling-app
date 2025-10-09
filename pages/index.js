@@ -20,11 +20,23 @@ const formatDate = () => {
 };
 
 const getRandomPosition = (index, total) => {
+  // User's drawing (index 0) is always at center
+  if (index === 0) {
+    return {
+      left: 0,
+      top: 0,
+      rotation: (Math.random() - 0.5) * 6
+    };
+  }
+  
+  // All other drawings distributed around the center
   const columns = Math.ceil(Math.sqrt(total * 1.5));
   const rows = Math.ceil(total / columns);
   
-  const row = Math.floor(index / columns);
-  const col = index % columns;
+  // Adjust index for grid (since index 0 is reserved for user)
+  const gridIndex = index - 1;
+  const row = Math.floor(gridIndex / columns);
+  const col = gridIndex % columns;
   
   // Center the grid around (0, 0)
   const centerOffsetX = (columns * 400) / 2;
@@ -1087,31 +1099,34 @@ useEffect(() => {
 // Calculate gallery container dimensions based on drawing positions
 const positions = gallery.map((_, index) => getRandomPosition(index, gallery.length));
 
-// User's drawing is always at index 0
+// User's drawing is always at index 0 and positioned at (0, 0)
 const userDrawingPos = positions[0];
 
-// Find the bounds of all drawings relative to their original positions
+// Find the bounds of all drawings
 const minX = Math.min(...positions.map(p => p.left));
 const maxX = Math.max(...positions.map(p => p.left));
 const minY = Math.min(...positions.map(p => p.top));
 const maxY = Math.max(...positions.map(p => p.top));
 
 // Calculate dimensions
-const topMargin = 250; // Space for header + small gap
+const topMargin = 250; // Space for header
 const padding = 200;
 const drawingSize = 350;
-const containerWidth = (maxX - minX) + (padding * 2) + drawingSize;
-const containerHeight = (maxY - minY) + topMargin + padding + drawingSize;
 
-// Calculate offsets to center user's drawing both horizontally and vertically
-const userDrawingOffsetY = topMargin - (userDrawingPos.top - minY);
+// Since user is at (0,0), we need to shift everything so user ends up at the right position
+const userTargetY = topMargin; // User should be this far from top
+const containerWidth = Math.max(Math.abs(minX), Math.abs(maxX)) * 2 + padding * 2 + drawingSize;
+const containerHeight = Math.abs(minY) + maxY + topMargin + padding + drawingSize;
+
+// Calculate offsets - user at (0,0) should end up centered horizontally and at topMargin vertically
 const horizontalCenter = containerWidth / 2;
-const userDrawingOffsetX = horizontalCenter - (userDrawingPos.left - minX + padding + (drawingSize / 2));
+const offsetX = horizontalCenter;
+const offsetY = Math.abs(minY) + topMargin;
 
-// Calculate final positions with both offsets
+// Calculate final positions
 const finalPositions = positions.map(pos => ({
-  left: pos.left - minX + padding + (drawingSize / 2) + userDrawingOffsetX,
-  top: pos.top - minY + userDrawingOffsetY,
+  left: pos.left + offsetX,
+  top: pos.top + offsetY,
   rotation: pos.rotation
 }));
 
@@ -1121,9 +1136,7 @@ console.log('User drawing position:', userDrawingPos);
 console.log('Min/Max X:', minX, maxX);
 console.log('Min/Max Y:', minY, maxY);
 console.log('Container size:', containerWidth, containerHeight);
-console.log('Horizontal center:', horizontalCenter);
-console.log('userDrawingOffsetX:', userDrawingOffsetX);
-console.log('userDrawingOffsetY:', userDrawingOffsetY);
+console.log('Offsets:', offsetX, offsetY);
 console.log('User final position:', userFinalPos);
 
 return (
