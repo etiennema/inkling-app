@@ -876,19 +876,27 @@ useEffect(() => {
 
   if (screen === 'error-validation') {
     return (
-      <div 
-        onClick={handleRetry}
-        style={{ 
-          minHeight: '100vh', 
-          backgroundColor: '#F5F5DC', 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center', 
-          padding: '20px', 
-          fontFamily: 'Helvetica, Arial, sans-serif',
-          cursor: 'pointer'
-        }}
-      >
+     <div 
+          onClick={handleRetry}
+          style={{ 
+            height: '100vh',
+            minHeight: '-webkit-fill-available',
+            backgroundColor: '#F5F5DC', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            padding: '20px', 
+            fontFamily: 'Helvetica, Arial, sans-serif',
+            cursor: 'pointer',
+            overflow: 'hidden',
+            boxSizing: 'border-box',
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0
+          }}
+    >
         <div style={{ 
           backgroundColor: '#000', 
           color: '#fff', 
