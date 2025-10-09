@@ -22,16 +22,16 @@ const formatDate = () => {
 const getRandomPosition = (index, total) => {
   const columns = Math.ceil(Math.sqrt(total * 1.5));
   const rows = Math.ceil(total / columns);
-
+  
   const row = Math.floor(index / columns);
   const col = index % columns;
   
-  // Center the grid by offsetting by half the total width/height
+  // Center the grid around (0, 0)
   const centerOffsetX = (columns * 400) / 2;
   const centerOffsetY = (rows * 400) / 2;
   
-  const baseX = (col * 400) - centerOffsetX + 200; // +200 for padding
-  const baseY = (row * 400) - centerOffsetY + 200;
+  const baseX = (col * 400) - centerOffsetX;
+  const baseY = (row * 400) - centerOffsetY;
   
   const randomX = (Math.random() - 0.5) * 100;
   const randomY = (Math.random() - 0.5) * 100;
@@ -1095,32 +1095,32 @@ const minX = Math.min(...positions.map(p => p.left));
 const maxX = Math.max(...positions.map(p => p.left));
 const minY = Math.min(...positions.map(p => p.top));
 const maxY = Math.max(...positions.map(p => p.top));
-  
 
-// Calculate how much we need to offset to put user's drawing near top
-const headerHeight = 200; // Space for header + breathing room
-const userDrawingOffsetY = headerHeight - (userDrawingPos.top - minY);
+// Calculate how much we need to offset to position user's drawing near top
+const topMargin = 250; // Space for header + small gap
+const userDrawingOffsetY = topMargin - (userDrawingPos.top - minY);
 
-// Calculate container dimensions with padding
-const padding = 400;
-const containerWidth = (maxX - minX) + (padding * 2) + 350; // 350 = drawing size
-const containerHeight = (maxY - minY) + (padding * 2) + 350 + userDrawingOffsetY;
+// Calculate container dimensions with smaller padding
+const padding = 200; // Reduced from 400
+const drawingSize = 350;
+const containerWidth = (maxX - minX) + (padding * 2) + drawingSize;
+const containerHeight = (maxY - minY) + topMargin + padding + drawingSize; // Start from top, add padding at bottom only
 
-// Calculate final positions (offset from minX/minY, plus padding, plus user drawing offset)
+// Calculate final positions
 const finalPositions = positions.map(pos => ({
-  left: pos.left - minX + padding,
-  top: pos.top - minY + padding + userDrawingOffsetY,
+  left: pos.left - minX + padding + (drawingSize / 2), // Center the drawing on its position
+  top: pos.top - minY + userDrawingOffsetY,
   rotation: pos.rotation
 }));
 
 const userFinalPos = finalPositions[0];
 
-// ADD CONSOLE LOGS HERE:
-  console.log('User drawing position:', userDrawingPos);
-  console.log('Min/Max X:', minX, maxX);
-  console.log('Min/Max Y:', minY, maxY);
-  console.log('Container size:', containerWidth, containerHeight);
-  console.log('User final position:', userFinalPos);
+console.log('User drawing position:', userDrawingPos);
+console.log('Min/Max X:', minX, maxX);
+console.log('Min/Max Y:', minY, maxY);
+console.log('Container size:', containerWidth, containerHeight);
+console.log('userDrawingOffsetY:', userDrawingOffsetY);
+console.log('User final position:', userFinalPos);
 
 return (
   <div style={{ height: '100vh', backgroundColor: '#F5F5DC', fontFamily: 'Helvetica, Arial, sans-serif', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
