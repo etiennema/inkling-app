@@ -686,42 +686,52 @@ useEffect(() => {
   }
 
   if (screen === 'first-time') {
-    return (
-      <div style={{ height: '100vh', minHeight: '-webkit-fill-available', backgroundColor: '#F5F5DC', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'Helvetica, Arial, sans-serif', overflow: 'hidden', boxSizing: 'border-box', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}>
-        <div style={{ maxWidth: '600px', width: '100%' }}>
-          <div style={{ backgroundColor: '#000', color: '#fff', padding: '48px', marginBottom: '48px' }}>
-            <p style={{ fontSize: 'clamp(16px, 3.5vw, 20px)', lineHeight: '1.6', margin: '0 0 24px 0' }}>
-              HI!
-            </p>
-            <p style={{ fontSize: 'clamp(16px, 3.5vw, 20px)', lineHeight: '1.6', margin: '0 0 24px 0' }}>
-              THIS IS AN EXPERIMENT. THINGS MIGHT BREAK!
-            </p>
-            <p style={{ fontSize: 'clamp(16px, 3.5vw, 20px)', lineHeight: '1.6', margin: '0 0 24px 0' }}>
-              BE NICE, DON'T OVERTHINK IT, AND HAVE SOME FUN!
-            </p>
-            <p style={{ fontSize: 'clamp(16px, 3.5vw, 20px)', lineHeight: '1.6', margin: '0' }}>
-              —ETIENNE
-            </p>
-          </div>
-          <div style={{ textAlign: 'right' }}>
-            <button
-              onClick={handleStart}
-              style={{
-                backgroundColor: 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-                padding: '0'
-              }}
-            >
-              <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M10 30H50M50 30L35 15M50 30L35 45" stroke="#0066FF" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </button>
-          </div>
+  return (
+    <div 
+      onClick={handleStart}
+      style={{ 
+        height: '100vh', 
+        minHeight: '-webkit-fill-available', 
+        backgroundColor: '#F5F5DC', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        padding: '20px', 
+        fontFamily: 'Helvetica, Arial, sans-serif', 
+        overflow: 'hidden', 
+        boxSizing: 'border-box', 
+        position: 'fixed', 
+        top: 0, 
+        left: 0, 
+        right: 0, 
+        bottom: 0,
+        cursor: 'pointer'
+      }}
+    >
+      <div style={{ maxWidth: '600px', width: '100%' }}>
+        <div style={{ backgroundColor: '#000', color: '#fff', padding: '48px', marginBottom: '48px' }}>
+          <p style={{ fontSize: 'clamp(16px, 3.5vw, 20px)', lineHeight: '1.6', margin: '0 0 24px 0' }}>
+            HI!
+          </p>
+          <p style={{ fontSize: 'clamp(16px, 3.5vw, 20px)', lineHeight: '1.6', margin: '0 0 24px 0' }}>
+            THIS IS AN EXPERIMENT. THINGS MIGHT BREAK!
+          </p>
+          <p style={{ fontSize: 'clamp(16px, 3.5vw, 20px)', lineHeight: '1.6', margin: '0 0 24px 0' }}>
+            BE NICE, DON'T OVERTHINK IT, AND HAVE SOME FUN!
+          </p>
+          <p style={{ fontSize: 'clamp(16px, 3.5vw, 20px)', lineHeight: '1.6', margin: '0' }}>
+            —ETIENNE
+          </p>
+        </div>
+        <div style={{ textAlign: 'right' }}>
+          <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 30H50M50 30L35 15M50 30L35 45" stroke="#0066FF" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
+}
 
   if (screen === 'landing') {
     return (
