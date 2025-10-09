@@ -979,7 +979,7 @@ useEffect(() => {
           
           <div style={{ flex: 1 }}></div> {/* ADD THIS - spacer in middle */}
           
-          <div style={{ position: 'absolute', bottom: '40px' }}>
+          <div style={{ position: 'absolute', bottom: '60px' }}>
             <svg width="165" height="83" viewBox="0 0 165 83" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M14 41.5H137.5M137.5 41.5L110 27.5M137.5 41.5L110 55.5" stroke="#0066FF" strokeWidth="5.5" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
