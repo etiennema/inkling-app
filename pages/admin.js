@@ -33,22 +33,43 @@ export default function Admin() {
   };
 
   const loadSubmissions = async () => {
-    setLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('submissions')
-        .select('*')
-        .order('submitted_at', { ascending: false });
+  setLoading(true);
+  try {
+    // First get all submissions
+    const { data: submissionsData, error: submissionsError } = await supabase
+      .from('submissions')
+      .select('*')
+      .order('submitted_at', { ascending: false });
 
-      if (error) throw error;
-      setSubmissions(data || []);
-    } catch (err) {
-      console.error('Error loading submissions:', err);
-      setError('Failed to load submissions');
-    } finally {
-      setLoading(false);
-    }
-  };
+    if (submissionsError) throw submissionsError;
+
+    // Then get all prompts
+    const { data: promptsData, error: promptsError } = await supabase
+      .from('prompts')
+      .select('prompt_index, prompt_text');
+
+    if (promptsError) throw promptsError;
+
+    // Create a map of prompt_index to prompt_text
+    const promptMap = {};
+    promptsData.forEach(p => {
+      promptMap[p.prompt_index] = p.prompt_text;
+    });
+
+    // Add prompt_text to each submission
+    const enrichedSubmissions = submissionsData.map(sub => ({
+      ...sub,
+      prompt_text: promptMap[sub.prompt_index] || 'Unknown'
+    }));
+
+    setSubmissions(enrichedSubmissions);
+  } catch (err) {
+    console.error('Error loading submissions:', err);
+    setError('Failed to load submissions');
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleDelete = async (submission) => {
     if (!confirm(`Delete this submission from "${submission.prompt_index}"?`)) {
@@ -246,7 +267,7 @@ export default function Admin() {
                   }}
                 />
                 <p style={{ margin: '0 0 8px 0', fontSize: '14px' }}>
-                  <strong>Prompt #{submission.prompt_index}</strong>
+                <strong>"{submission.prompt_text}" (Prompt #{submission.prompt_index})</strong>
                 </p>
                 <p style={{ margin: '0 0 8px 0', fontSize: '12px', color: '#666' }}>
                   {formatDate(submission.submitted_at)}
