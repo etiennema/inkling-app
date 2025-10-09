@@ -72,43 +72,55 @@ export default function Admin() {
 };
 
   const handleDelete = async (submission) => {
-    if (!confirm(`Delete this submission from "${submission.prompt_index}"?`)) {
-      return;
-    }
+  if (!confirm(`Delete this submission: "${submission.prompt_text}" (Prompt #${submission.prompt_index})?`)) {
+    return;
+  }
 
-    setDeletingId(submission.id);
-    try {
-      // Extract filename from URL
-      const url = submission.image_url;
-      const filename = url.split('/').pop().split('?')[0];
+  setDeletingId(submission.id);
+  try {
+    // Extract filename from URL
+    const url = submission.image_url;
+    const filename = url.split('/drawings/')[1]?.split('?')[0];
 
-      // Delete from storage
+    console.log('Attempting to delete:', filename);
+
+    // Try to delete from storage (don't fail if file doesn't exist)
+    if (filename) {
       const { error: storageError } = await supabase.storage
         .from('drawings')
         .remove([filename]);
 
       if (storageError) {
-        console.error('Storage deletion error:', storageError);
+        console.warn('Storage deletion warning (file may not exist):', storageError);
+        // Don't throw - continue to delete from database anyway
+      } else {
+        console.log('Storage file deleted successfully');
       }
-
-      // Delete from database
-      const { error: dbError } = await supabase
-        .from('submissions')
-        .delete()
-        .eq('id', submission.id);
-
-      if (dbError) throw dbError;
-
-      // Remove from local state
-      setSubmissions(prev => prev.filter(s => s.id !== submission.id));
-      alert('Submission deleted successfully');
-    } catch (err) {
-      console.error('Error deleting submission:', err);
-      alert('Failed to delete submission');
-    } finally {
-      setDeletingId(null);
     }
-  };
+
+    // Delete from database - this is the critical one
+    const { error: dbError } = await supabase
+      .from('submissions')
+      .delete()
+      .eq('id', submission.id);
+
+    if (dbError) {
+      console.error('Database deletion error:', dbError);
+      throw dbError;
+    }
+
+    console.log('Database record deleted successfully');
+
+    // Remove from local state
+    setSubmissions(prev => prev.filter(s => s.id !== submission.id));
+    alert('Submission deleted successfully');
+  } catch (err) {
+    console.error('Error deleting submission:', err);
+    alert(`Failed to delete submission: ${err.message}`);
+  } finally {
+    setDeletingId(null);
+  }
+};
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
