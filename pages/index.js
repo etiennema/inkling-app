@@ -1108,20 +1108,19 @@ const maxX = Math.max(...positions.map(p => p.left));
 const minY = Math.min(...positions.map(p => p.top));
 const maxY = Math.max(...positions.map(p => p.top));
 
-// Calculate dimensions
+// Calculate dimensions with tighter padding
 const topMargin = 250; // Space for header
-const padding = 200;
+const padding = 50; // Reduced padding
 const drawingSize = 350;
 
-// Since user is at (0,0), we need to shift everything so user ends up at the right position
-const userTargetY = topMargin; // User should be this far from top
-const containerWidth = Math.max(Math.abs(minX), Math.abs(maxX)) * 2 + padding * 2 + drawingSize;
-const containerHeight = Math.abs(minY) + maxY + topMargin + padding + drawingSize;
+// Container needs to fit from minX to maxX, plus half a drawing on each side, plus small padding
+const containerWidth = (maxX - minX) + drawingSize + (padding * 2);
+const containerHeight = (maxY - minY) + drawingSize + topMargin + padding;
 
 // Calculate offsets - user at (0,0) should end up centered horizontally and at topMargin vertically
 const horizontalCenter = containerWidth / 2;
-const offsetX = horizontalCenter;
-const offsetY = Math.abs(minY) + topMargin;
+const offsetX = horizontalCenter - minX; // Shift so minX is at left edge (with drawing size accounted for)
+const offsetY = topMargin - minY; // Shift so minY starts at topMargin
 
 // Calculate final positions
 const finalPositions = positions.map(pos => ({
