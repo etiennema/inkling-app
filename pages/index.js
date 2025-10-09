@@ -1096,19 +1096,21 @@ const maxX = Math.max(...positions.map(p => p.left));
 const minY = Math.min(...positions.map(p => p.top));
 const maxY = Math.max(...positions.map(p => p.top));
 
-// Calculate how much we need to offset to position user's drawing near top
+// Calculate dimensions
 const topMargin = 250; // Space for header + small gap
-const userDrawingOffsetY = topMargin - (userDrawingPos.top - minY);
-
-// Calculate container dimensions with smaller padding
 const padding = 200;
 const drawingSize = 350;
 const containerWidth = (maxX - minX) + (padding * 2) + drawingSize;
 const containerHeight = (maxY - minY) + topMargin + padding + drawingSize;
 
-// Calculate final positions
+// Calculate offsets to center user's drawing both horizontally and vertically
+const userDrawingOffsetY = topMargin - (userDrawingPos.top - minY);
+const horizontalCenter = containerWidth / 2;
+const userDrawingOffsetX = horizontalCenter - (userDrawingPos.left - minX + padding + (drawingSize / 2));
+
+// Calculate final positions with both offsets
 const finalPositions = positions.map(pos => ({
-  left: pos.left - minX + padding + (drawingSize / 2),
+  left: pos.left - minX + padding + (drawingSize / 2) + userDrawingOffsetX,
   top: pos.top - minY + userDrawingOffsetY,
   rotation: pos.rotation
 }));
@@ -1119,6 +1121,8 @@ console.log('User drawing position:', userDrawingPos);
 console.log('Min/Max X:', minX, maxX);
 console.log('Min/Max Y:', minY, maxY);
 console.log('Container size:', containerWidth, containerHeight);
+console.log('Horizontal center:', horizontalCenter);
+console.log('userDrawingOffsetX:', userDrawingOffsetX);
 console.log('userDrawingOffsetY:', userDrawingOffsetY);
 console.log('User final position:', userFinalPos);
 
