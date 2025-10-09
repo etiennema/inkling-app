@@ -12,6 +12,9 @@ const TIMER_DURATION = 60;
 const MIN_COVERAGE = 0.002;
 const MIN_TIME = 3;
 
+// Global app start date - everyone gets prompts based on this date
+const APP_START_DATE = new Date('2025-10-09T00:00:00Z');
+
 // Helper functions
 const formatDate = () => {
   const date = new Date();
