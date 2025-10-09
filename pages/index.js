@@ -1201,7 +1201,7 @@ return (
       </svg>
     </div>
   </div>
-  );
+  ); 
 }
 
 return null;
