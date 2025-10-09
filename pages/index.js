@@ -1101,14 +1101,14 @@ const topMargin = 250; // Space for header + small gap
 const userDrawingOffsetY = topMargin - (userDrawingPos.top - minY);
 
 // Calculate container dimensions with smaller padding
-const padding = 200; // Reduced from 400
+const padding = 200;
 const drawingSize = 350;
 const containerWidth = (maxX - minX) + (padding * 2) + drawingSize;
-const containerHeight = (maxY - minY) + topMargin + padding + drawingSize; // Start from top, add padding at bottom only
+const containerHeight = (maxY - minY) + topMargin + padding + drawingSize;
 
 // Calculate final positions
 const finalPositions = positions.map(pos => ({
-  left: pos.left - minX + padding + (drawingSize / 2), // Center the drawing on its position
+  left: pos.left - minX + padding + (drawingSize / 2),
   top: pos.top - minY + userDrawingOffsetY,
   rotation: pos.rotation
 }));
@@ -1140,7 +1140,7 @@ return (
       ref={(el) => {
         if (el && galleryState === 'loaded') {
           // Center user's drawing horizontally, start at top vertically
-          const scrollX = userFinalPos.left - (window.innerWidth / 2) + 175; // 175 = half of drawing width (350/2)
+          const scrollX = userFinalPos.left - (window.innerWidth / 2);
           const scrollY = 0;
           el.scrollTo(scrollX, scrollY);
         }
