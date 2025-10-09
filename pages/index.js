@@ -1095,14 +1095,6 @@ const minX = Math.min(...positions.map(p => p.left));
 const maxX = Math.max(...positions.map(p => p.left));
 const minY = Math.min(...positions.map(p => p.top));
 const maxY = Math.max(...positions.map(p => p.top));
-
-
-// ADD CONSOLE LOGS HERE:
-  console.log('User drawing position:', userDrawingPos);
-  console.log('Min/Max X:', minX, maxX);
-  console.log('Min/Max Y:', minY, maxY);
-  console.log('Container size:', containerWidth, containerHeight);
-  console.log('User final position:', userFinalPos);
   
 
 // Calculate how much we need to offset to put user's drawing near top
@@ -1122,6 +1114,13 @@ const finalPositions = positions.map(pos => ({
 }));
 
 const userFinalPos = finalPositions[0];
+
+// ADD CONSOLE LOGS HERE:
+  console.log('User drawing position:', userDrawingPos);
+  console.log('Min/Max X:', minX, maxX);
+  console.log('Min/Max Y:', minY, maxY);
+  console.log('Container size:', containerWidth, containerHeight);
+  console.log('User final position:', userFinalPos);
 
 return (
   <div style={{ height: '100vh', backgroundColor: '#F5F5DC', fontFamily: 'Helvetica, Arial, sans-serif', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
