@@ -340,10 +340,13 @@ useEffect(() => {
 
       if (userError) throw userError;
 
-      const userStartDate = new Date(userData.created_at);
       const now = new Date();
-      const daysSinceStart = Math.floor((now - userStartDate) / (1000 * 60 * 60 * 24));
-      const currentPromptIndex = daysSinceStart + 1;
+      // Calculate days since app launch (not user signup)
+      const daysSinceAppStart = Math.floor((now - APP_START_DATE) / (1000 * 60 * 60 * 24));
+      const currentPromptIndex = daysSinceAppStart + 1;
+
+      console.log('Days since app start:', daysSinceAppStart);
+      console.log('Current prompt index:', currentPromptIndex);
 
       setPromptIndex(currentPromptIndex);
 
@@ -740,13 +743,13 @@ useEffect(() => {
     return (
       <div style={{ height: '100vh', minHeight: '-webkit-fill-available', backgroundColor: '#F5F5DC', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'Helvetica, Arial, sans-serif', overflow: 'hidden', boxSizing: 'border-box', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}>
         <div style={{ maxWidth: '600px', width: '100%', textAlign: 'center' }}>
-          <h1 style={{ fontSize: 'clamp(50px, 12.5vw, 90px)', fontWeight: 'bold', margin: '0 0 16px 0', letterSpacing: '-2px' }}>INKLING</h1>
-          <p style={{ fontSize: 'clamp(11px, 2.5vw, 14px)', textTransform: 'uppercase', margin: '0 0 60px 0', letterSpacing: '1px' }}>TINY ACTS OF DRAWING</p>
+          <h1 style={{ fontSize: 'clamp(50px, 12.5vw, 90px)', fontWeight: 'bold', margin: '0 0 16px 0', letterSpacing: '-2px' }}>SQUIGGLE</h1>
+          <p style={{ fontSize: 'clamp(11px, 2.5vw, 14px)', textTransform: 'uppercase', margin: '0 0 60px 0', letterSpacing: '1px' }}>TINY ACTS OF DAILY DRAWING</p>
           <div style={{ marginBottom: '60px', fontSize: 'clamp(21px, 5vw, 27px)', lineHeight: '1.2' }}>
             <p style={{ margin: '0' }}>1 PROMPT</p>
             <p style={{ margin: '0' }}>1 MINUTE</p>
             <p style={{ margin: '0' }}>1 DRAWING</p>
-            <p style={{ margin: '48px 0 0 0', fontWeight: 'bold' }}>DAILY</p>
+            <p style={{ margin: '48px 0 0 0', fontWeight: 'bold' }}>EVERY DAY</p>
           </div>
           <button
             onClick={handleStart}
