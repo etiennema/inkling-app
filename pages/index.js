@@ -758,6 +758,7 @@ if (screen === 'landing') {
       right: 0, 
       bottom: 0 
     }}>
+      
             <div
         style={{
           position: 'absolute',
