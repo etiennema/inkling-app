@@ -729,8 +729,8 @@ useEffect(() => {
             —ETIENNE
           </p>
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '48px' }}>
-          <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M10 30H50M50 30L35 15M50 30L35 45" stroke="#0066FF" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+          <svg width="165" height="83" viewBox="0 0 165 83" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M14 41.5H137.5M137.5 41.5L110 27.5M137.5 41.5L110 55.5" stroke="#0066FF" strokeWidth="5.5" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </div>
         </div>
@@ -758,7 +758,7 @@ if (screen === 'landing') {
       right: 0, 
       bottom: 0 
     }}>
-      
+
             <div
         style={{
           position: 'absolute',
