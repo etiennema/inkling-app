@@ -741,8 +741,106 @@ useEffect(() => {
 
   if (screen === 'landing') {
     return (
-      <div style={{ height: '100vh', minHeight: '-webkit-fill-available', backgroundColor: '#F5F5DC', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'Helvetica, Arial, sans-serif', overflow: 'hidden', boxSizing: 'border-box', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}>
-        <div style={{ maxWidth: '600px', width: '100%', textAlign: 'center' }}>
+      <div style={{ 
+        height: '100vh', 
+        minHeight: '-webkit-fill-available', 
+        backgroundColor: '#F5F5DC', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        padding: '20px', 
+        fontFamily: 'Helvetica, Arial, sans-serif', 
+        overflow: 'hidden', 
+        boxSizing: 'border-box', 
+        position: 'fixed', 
+        top: 0, 
+        left: 0, 
+        right: 0, 
+        bottom: 0 
+      }}>
+        {/* Hand-drawn squiggle border */}
+        <svg
+          viewBox="0 0 400 600"
+          preserveAspectRatio="none"
+          style={{
+            position: 'absolute',
+            top: '10px',
+            left: '10px',
+            right: '10px',
+            bottom: '10px',
+            width: 'calc(100% - 20px)',
+            height: 'calc(100% - 20px)',
+            pointerEvents: 'none',
+            zIndex: 1
+          }}
+        >
+          {/* Organic hand-drawn continuous loop */}
+          <path
+            d="M 30 80 
+               Q 20 85, 25 95
+               Q 28 105, 22 115
+               Q 18 125, 25 135
+               Q 30 145, 25 155
+               Q 22 170, 28 185
+               Q 32 200, 28 215
+               Q 25 235, 30 255
+               Q 33 275, 28 295
+               Q 25 315, 32 335
+               Q 35 355, 30 375
+               Q 27 395, 33 415
+               Q 36 435, 32 455
+               Q 30 475, 35 490
+               Q 38 505, 35 520
+               
+               L 50 525
+               Q 70 528, 90 525
+               Q 110 523, 130 527
+               Q 155 530, 180 526
+               Q 205 523, 230 528
+               Q 255 531, 280 527
+               Q 305 524, 330 529
+               Q 350 532, 365 528
+               
+               L 370 510
+               Q 375 490, 372 470
+               Q 370 445, 375 420
+               Q 378 395, 373 370
+               Q 371 345, 376 320
+               Q 379 295, 374 270
+               Q 372 245, 377 220
+               Q 380 195, 375 170
+               Q 373 145, 378 120
+               Q 380 100, 376 85
+               Q 374 75, 370 70
+               
+               L 350 75
+               Q 325 78, 300 74
+               Q 275 71, 250 76
+               Q 220 79, 190 75
+               Q 160 72, 130 77
+               Q 100 80, 70 76
+               Q 50 74, 35 78
+               
+               Z"
+            fill="none"
+            stroke="#000000"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{
+              filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.1))'
+            }}
+          />
+        </svg>
+
+        {/* Content */}
+        <div style={{ 
+          maxWidth: '600px', 
+          width: '100%', 
+          textAlign: 'center',
+          position: 'relative',
+          zIndex: 2
+        }}>
           <h1 style={{ fontSize: 'clamp(50px, 12.5vw, 90px)', fontWeight: 'bold', margin: '0 0 16px 0', letterSpacing: '-2px' }}>SQUIGGLE</h1>
           <p style={{ fontSize: 'clamp(11px, 2.5vw, 14px)', textTransform: 'uppercase', margin: '0 0 60px 0', letterSpacing: '1px' }}>TINY ACTS OF DAILY DRAWING</p>
           <div style={{ marginBottom: '60px', fontSize: 'clamp(21px, 5vw, 27px)', lineHeight: '1.2' }}>
