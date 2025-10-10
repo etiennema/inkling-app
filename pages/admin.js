@@ -15,10 +15,13 @@ export default function Admin() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [deletingId, setDeletingId] = useState(null);
+  const [milestoneEmails, setMilestoneEmails] = useState([]);
 
-  useEffect(() => {
+
+useEffect(() => {
     if (isAuthenticated) {
       loadSubmissions();
+      loadMilestoneEmails(); // ADD THIS LINE
     }
   }, [isAuthenticated]);
 
@@ -70,6 +73,20 @@ export default function Admin() {
     setLoading(false);
   }
 };
+
+const loadMilestoneEmails = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('milestone_emails')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      setMilestoneEmails(data || []);
+    } catch (err) {
+      console.error('Error loading milestone emails:', err);
+    }
+  };
 
   const handleDelete = async (submission) => {
   if (!confirm(`Delete this submission: "${submission.prompt_text}" (Prompt #${submission.prompt_index})?`)) {
@@ -249,6 +266,41 @@ export default function Admin() {
         <p style={{ marginBottom: '40px', fontSize: '18px' }}>
           Total submissions: <strong>{submissions.length}</strong>
         </p>
+
+        {/* Milestone Emails Section */}
+        {milestoneEmails.length > 0 && (
+          <div style={{ 
+            marginBottom: '60px',
+            padding: '24px',
+            backgroundColor: '#fff',
+            border: '3px solid #0066FF'
+          }}>
+            <h2 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '16px' }}>
+              🎉 MILESTONE EMAILS ({milestoneEmails.length})
+            </h2>
+            {milestoneEmails.map(entry => (
+              <div 
+                key={entry.id}
+                style={{
+                  padding: '16px',
+                  marginBottom: '12px',
+                  border: '1px solid #ddd',
+                  backgroundColor: '#F5F5DC'
+                }}
+              >
+                <p style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: 'bold' }}>
+                  {entry.email}
+                </p>
+                <p style={{ margin: '0 0 4px 0', fontSize: '14px' }}>
+                  User: {entry.user_id.substring(0, 8)}... | Count: {entry.submission_count}
+                </p>
+                <p style={{ margin: 0, fontSize: '12px', color: '#666' }}>
+                  {formatDate(entry.created_at)}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
 
         {loading ? (
           <p style={{ fontSize: '24px', textAlign: 'center' }}>Loading...</p>

@@ -65,6 +65,7 @@ function GalleryDrawing({ drawing, index, isUserDrawing }) {
   const [isAnimating, setIsAnimating] = useState(false);
   const [hasAnimated, setHasAnimated] = useState(false);
   const [shouldStart, setShouldStart] = useState(false);
+  
 
   useEffect(() => {
   const observer = new IntersectionObserver(
@@ -213,6 +214,11 @@ export default function Home() {
   const [submittingDots, setSubmittingDots] = useState(1);
   const [lastSubmittedImage, setLastSubmittedImage] = useState(null);
   const [galleryState, setGalleryState] = useState('loading');
+
+    // ADD THESE THREE NEW LINES HERE:
+  const [showEmailCapture, setShowEmailCapture] = useState(false);
+  const [milestoneEmail, setMilestoneEmail] = useState('');
+  const [emailSubmitted, setEmailSubmitted] = useState(false);
   
   const canvasRef = useRef(null);
   const timerRef = useRef(null); 
@@ -981,67 +987,147 @@ if (screen === 'landing') {
   }
 
   if (screen === 'congrats') {
-    return (
-      <div 
-          onClick={() => setScreen('gallery')}
-          style={{ 
-            height: '100vh',
-            minHeight: '-webkit-fill-available',
-            backgroundColor: '#F5F5DC', 
-            display: 'flex', 
-            flexDirection: 'column',
-            alignItems: 'center', 
-            justifyContent: 'center', 
-            padding: '20px 20px 80px 20px', // Reduced top padding, increased bottom for arrow
-            fontFamily: 'Helvetica, Arial, sans-serif',
-            cursor: 'pointer',
-            position: 'relative',
-            overflow: 'hidden',
-            boxSizing: 'border-box',
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0
-          }}
-        >
-          <div style={{ flex: 1 }}></div> {/* ADD THIS - spacer at top */}
-          
-          <h1 style={{ fontSize: 'clamp(48px, 10vw, 72px)', fontWeight: 'bold', margin: '0 0 40px 0', textAlign: 'center' }}> {/* Reduced bottom margin from 60px to 40px */}
-            CONGRATS!
-          </h1>
-          
-          <div style={{ marginBottom: '30px', maxWidth: '400px', width: '100%', aspectRatio: '1/1' }}> {/* Reduced from 40px to 30px */}
-            {lastSubmittedImage && (
-              <img
-                src={lastSubmittedImage}
-                alt="Your drawing"
+  // Check if this is the 50th drawing
+  const isMilestone = submissionCount === 50;
+  
+  return (
+    <div 
+      onClick={() => !isMilestone && setScreen('gallery')}
+      style={{ 
+        height: '100vh',
+        minHeight: '-webkit-fill-available',
+        backgroundColor: '#F5F5DC', 
+        display: 'flex', 
+        flexDirection: 'column',
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        padding: '20px 20px 80px 20px',
+        fontFamily: 'Helvetica, Arial, sans-serif',
+        cursor: isMilestone ? 'default' : 'pointer',
+        position: 'relative',
+        overflow: 'hidden',
+        boxSizing: 'border-box',
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0
+      }}
+    >
+      <div style={{ flex: 1 }}></div>
+      
+      <h1 style={{ fontSize: 'clamp(48px, 10vw, 72px)', fontWeight: 'bold', margin: '0 0 40px 0', textAlign: 'center' }}>
+        {isMilestone ? "YOU'VE COMPLETED 50 DRAWINGS! 🎉" : "CONGRATS!"}
+      </h1>
+      
+      <div style={{ marginBottom: '30px', maxWidth: '400px', width: '100%', aspectRatio: '1/1' }}>
+        {lastSubmittedImage && (
+          <img
+            src={lastSubmittedImage}
+            alt="Your drawing"
+            style={{
+              border: '2px solid #000',
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover'
+            }}
+          />
+        )}
+      </div>
+      
+      {!isMilestone ? (
+        <p style={{ fontSize: 'clamp(18px, 4vw, 24px)', textAlign: 'center', margin: '0 0 40px 0', lineHeight: '1.4' }}>
+          YOU'VE COMPLETED<br />
+          <strong style={{ fontSize: 'clamp(36px, 8vw, 56px)' }}>{submissionCount}</strong><br />
+          DRAWING{submissionCount !== 1 ? 'S' : ''} SO FAR.
+        </p>
+      ) : (
+        <div style={{ width: '100%', maxWidth: '400px', textAlign: 'center' }}>
+          {!emailSubmitted ? (
+            <>
+              <p style={{ fontSize: 'clamp(18px, 4vw, 24px)', margin: '0 0 24px 0', lineHeight: '1.4' }}>
+                ENTER YOUR EMAIL FOR A LIL SURPRISE:
+              </p>
+              <input
+                type="email"
+                value={milestoneEmail}
+                onChange={(e) => setMilestoneEmail(e.target.value)}
+                placeholder="your@email.com"
                 style={{
-                  border: '2px solid #000',
                   width: '100%',
-                  height: '100%',
-                  objectFit: 'cover'
+                  padding: '16px',
+                  fontSize: '18px',
+                  border: '2px solid #000',
+                  marginBottom: '16px',
+                  fontFamily: 'Helvetica, Arial, sans-serif',
+                  boxSizing: 'border-box',
+                  textAlign: 'center'
                 }}
               />
-            )}
-          </div>
-          
-          <p style={{ fontSize: 'clamp(18px, 4vw, 24px)', textAlign: 'center', margin: '0 0 40px 0', lineHeight: '1.4' }}> {/* Reduced from 60px to 40px */}
-            YOU'VE COMPLETED<br />
-            <strong style={{ fontSize: 'clamp(36px, 8vw, 56px)' }}>{submissionCount}</strong><br />
-            DRAWING{submissionCount !== 1 ? 'S' : ''} SO FAR.
-          </p>
-          
-          <div style={{ flex: 1 }}></div> {/* ADD THIS - spacer in middle */}
-          
-          <div style={{ position: 'absolute', bottom: '60px' }}>
-            <svg width="165" height="83" viewBox="0 0 165 83" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M14 41.5H137.5M137.5 41.5L110 27.5M137.5 41.5L110 55.5" stroke="#0066FF" strokeWidth="5.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </div>
+              <button
+                onClick={async () => {
+                  if (!milestoneEmail || !milestoneEmail.includes('@')) {
+                    alert('Please enter a valid email');
+                    return;
+                  }
+                  
+                  try {
+                    const { error } = await supabase
+                      .from('milestone_emails')
+                      .insert({
+                        user_id: userId,
+                        email: milestoneEmail,
+                        submission_count: submissionCount
+                      });
+                    
+                    if (error) throw error;
+                    setEmailSubmitted(true);
+                  } catch (err) {
+                    console.error('Error saving email:', err);
+                    alert('Oops! Please try again.');
+                  }
+                }}
+                style={{
+                  width: '100%',
+                  padding: '16px',
+                  fontSize: '18px',
+                  backgroundColor: '#0066FF',
+                  color: '#fff',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontFamily: 'Helvetica, Arial, sans-serif',
+                  fontWeight: '500'
+                }}
+              >
+                SUBMIT
+              </button>
+            </>
+          ) : (
+            <p style={{ fontSize: 'clamp(18px, 4vw, 24px)', margin: '0 0 40px 0', lineHeight: '1.4' }}>
+              ✨ THANK YOU! ✨<br />
+              KEEP AN EYE ON YOUR INBOX
+            </p>
+          )}
         </div>
-    );
-  }
+      )}
+      
+      <div style={{ flex: 1 }}></div>
+      
+      <div 
+        onClick={() => setScreen('gallery')}
+        style={{ 
+          position: 'absolute', 
+          bottom: '60px',
+          cursor: 'pointer'
+        }}
+      >
+        <svg width="165" height="83" viewBox="0 0 165 83" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M14 41.5H137.5M137.5 41.5L110 27.5M137.5 41.5L110 55.5" stroke="#0066FF" strokeWidth="5.5" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </div>
+    </div>
+  );
+}
 
   if (screen === 'already-done') {
     return (
