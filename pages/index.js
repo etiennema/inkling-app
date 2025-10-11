@@ -1267,56 +1267,83 @@ if (screen === 'landing') {
     );
   }
 
-// Simple layout: user at top-center, others flow around and below
+// Grid layout: user at top-center, grid expands around and below
 const drawingSize = 350;
+const spacing = 420; // Space between drawing centers
 const positions = [];
 
-// Calculate positions
-gallery.forEach((item, index) => {
-  if (index === 0) {
-    // User's drawing: fixed at top-center
-    positions.push({
-      left: 0,
-      top: 0,
-      rotation: (Math.random() - 0.5) * 6
-    });
-  } else {
-    // Other drawings: arranged in expanding rows below
-    const itemsPerRow = Math.min(3, gallery.length - 1); // Max 3 per row
-    const row = Math.floor((index - 1) / itemsPerRow);
-    const col = (index - 1) % itemsPerRow;
-    
-    // Center each row
-    const rowWidth = Math.min(itemsPerRow, gallery.length - 1 - (row * itemsPerRow)) * 450;
-    const startX = -(rowWidth / 2) + 225;
-    
-    positions.push({
-      left: startX + (col * 450) + ((Math.random() - 0.5) * 80),
-      top: 500 + (row * 450) + ((Math.random() - 0.5) * 80),
-      rotation: (Math.random() - 0.5) * 8
-    });
-  }
+const othersCount = gallery.length - 1;
+
+// Calculate columns (grow sideways as needed)
+const columns = Math.max(3, Math.ceil(Math.sqrt(gallery.length * 1.5)));
+
+// User always in first row, center column
+const userCol = Math.floor(columns / 2);
+
+// Place user's drawing
+positions.push({
+  left: userCol * spacing,
+  top: 0,
+  rotation: (Math.random() - 0.5) * 4
 });
 
-// Calculate container size to fit all drawings
-const allX = positions.map(p => p.left);
-const allY = positions.map(p => p.top);
-const minX = Math.min(...allX);
-const maxX = Math.max(...allX);
-const minY = Math.min(...allY);
-const maxY = Math.max(...allY);
+// Place other drawings in grid
+let currentRow = 0;
+let currentCol = 0;
+
+for (let i = 0; i < othersCount; i++) {
+  // Skip the user's position (row 0, center column)
+  if (currentRow === 0 && currentCol === userCol) {
+    currentCol++;
+    if (currentCol >= columns) {
+      currentCol = 0;
+      currentRow++;
+    }
+  }
+  
+  positions.push({
+    left: currentCol * spacing,
+    top: currentRow * spacing,
+    rotation: (Math.random() - 0.5) * 4
+  });
+  
+  // Move to next grid position
+  currentCol++;
+  if (currentCol >= columns) {
+    currentCol = 0;
+    currentRow++;
+  }
+}
+
+// Center the grid horizontally around x=0
+const gridWidth = (columns - 1) * spacing;
+const centerOffsetX = gridWidth / 2;
+
+const centeredPositions = positions.map(pos => ({
+  left: pos.left - centerOffsetX,
+  top: pos.top,
+  rotation: pos.rotation
+}));
+
+// Calculate container size
+const allX = centeredPositions.map(p => p.left);
+const allY = centeredPositions.map(p => p.top);
+const minX = Math.min(...allX) - (drawingSize / 2);
+const maxX = Math.max(...allX) + (drawingSize / 2);
+const minY = 0;
+const maxY = Math.max(...allY) + (drawingSize / 2);
 
 const topMargin = 250;
-const padding = 225;
+const sidePadding = 50; // Minimal padding so edges peek out
 
-const containerWidth = (maxX - minX) + drawingSize + (padding * 2);
-const containerHeight = (maxY - minY) + drawingSize + topMargin + padding;
+const containerWidth = (maxX - minX) + (sidePadding * 2);
+const containerHeight = maxY + topMargin + 100;
 
-// Calculate final positions with offsets
-const offsetX = -minX + padding + (drawingSize / 2);
+// Calculate final positions
+const offsetX = -minX + sidePadding;
 const offsetY = topMargin;
 
-const finalPositions = positions.map(pos => ({
+const finalPositions = centeredPositions.map(pos => ({
   left: pos.left + offsetX,
   top: pos.top + offsetY,
   rotation: pos.rotation
