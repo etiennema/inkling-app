@@ -13,7 +13,7 @@ const MIN_COVERAGE = 0.002;
 const MIN_TIME = 3;
 
 // Global app start date - everyone gets prompts based on this date
-const APP_START_DATE = new Date('2025-10-09T00:00:00Z');
+const APP_START_DATE = new Date('2025-10-11T00:00:00Z');
 
 // Helper functions
 const formatDate = () => {
@@ -536,16 +536,19 @@ useEffect(() => {
   };
 
   const calculateCoverage = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return 0;
-    
-    const ctx = canvas.getContext('2d');
+  const canvas = canvasRef.current;
+  if (!canvas) return 0;
+  
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return 0;
+  
+  try {
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const pixels = imageData.data;
     
     let markedPixels = 0;
     const totalPixels = pixels.length / 4;
-    const bgR = 245, bgG = 245, bgB = 220;
+    const bgR = 248, bgG = 246, bgB = 242; // Updated to new background color
     
     for (let i = 0; i < pixels.length; i += 4) {
       const r = pixels[i];
@@ -558,7 +561,11 @@ useEffect(() => {
     }
     
     return markedPixels / totalPixels;
-  };
+  } catch (err) {
+    console.error('Error calculating coverage:', err);
+    return 0;
+  }
+};
 
   const handleSubmit = async () => {
     if (isSubmitting) return;
