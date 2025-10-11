@@ -1147,7 +1147,7 @@ if (screen === 'landing') {
       <div style={{ minHeight: '100vh', backgroundColor: '#F8F6F2', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'Helvetica, Arial, sans-serif' }}>
         <div style={{ textAlign: 'center' }}>
           <p style={{ fontSize: '18px', marginBottom: '16px' }}>ALL DONE FOR TODAY.</p>
-          <p style={{ marginBottom: '32px' }}><strong>COME BACK TOMORROW FOR A NEW PROMPT!</strong></p>
+          <p style={{ marginBottom: '32px' }}><strong><u>COME BACK TOMORROW FOR A NEW PROMPT!</u></strong></p>
           <p style={{ fontSize: '32px', fontFamily: 'monospace', marginBottom: '32px' }}>{countdown || getTimeUntilMidnight()}</p>
           <button
             onClick={() => setScreen('gallery')}
