@@ -155,7 +155,7 @@ const loadMilestoneEmails = async () => {
     return (
       <div style={{
         minHeight: '100vh',
-        backgroundColor: '#F5F5DC',
+        backgroundColor: '#F8F6F2',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -216,7 +216,7 @@ const loadMilestoneEmails = async () => {
   return (
     <div style={{
       minHeight: '100vh',
-      backgroundColor: '#F5F5DC',
+      backgroundColor: '#F8F6F2',
       fontFamily: 'Helvetica, Arial, sans-serif',
       padding: '40px 20px'
     }}>
@@ -285,7 +285,7 @@ const loadMilestoneEmails = async () => {
                   padding: '16px',
                   marginBottom: '12px',
                   border: '1px solid #ddd',
-                  backgroundColor: '#F5F5DC'
+                  backgroundColor: '#F8F6F2'
                 }}
               >
                 <p style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: 'bold' }}>
@@ -305,20 +305,15 @@ const loadMilestoneEmails = async () => {
         {loading ? (
           <p style={{ fontSize: '24px', textAlign: 'center' }}>Loading...</p>
         ) : (
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-            gap: '24px'
-          }}>
-            {submissions.map(submission => (
-              <div
-                key={submission.id}
-                style={{
-                  border: '2px solid #000',
-                  padding: '16px',
-                  backgroundColor: '#fff'
-                }}
-              >
+         <div
+            key={submission.id}
+            style={{
+                border: '2px solid #000',
+                padding: '16px',
+                backgroundColor: submission.archived ? '#FFE6E6' : '#fff',  // CHANGED
+                opacity: submission.archived ? 0.6 : 1  // ADDED
+            }}
+>
                 <img
                   src={submission.image_url}
                   alt="Submission"
@@ -331,7 +326,8 @@ const loadMilestoneEmails = async () => {
                   }}
                 />
                 <p style={{ margin: '0 0 8px 0', fontSize: '14px' }}>
-                <strong>"{submission.prompt_text}" (Prompt #{submission.prompt_index})</strong>
+                    <strong>"{submission.prompt_text}" (Prompt #{submission.prompt_index})</strong>
+                    {submission.archived && <span style={{ color: '#FF0000', marginLeft: '8px' }}>[ARCHIVED]</span>}
                 </p>
                 <p style={{ margin: '0 0 8px 0', fontSize: '12px', color: '#666' }}>
                   {formatDate(submission.submitted_at)}
