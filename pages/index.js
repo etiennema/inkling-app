@@ -1370,8 +1370,8 @@ return (
         <p style={{ fontSize: 'clamp(16px, 3vw, 20px)', textAlign: 'center', margin: '0' }}>
           {formatDate()}
         </p>
-        <p style={{ fontSize: 'clamp(12px, 2.5vw, 14px)', textAlign: 'center', margin: '0', fontFamily: 'Helvetica, Arial, sans-serif' }}>
-          (Scroll around to see the *{gallery.length - 1}* other drawing{gallery.length - 1 !== 1 ? 's' : ''} submitted today!)
+        <p style={{ fontSize: 'clamp(12px, 2.5vw, 14px)', textAlign: 'center', margin: '0', fontFamily: 'Helvetica, Arial, sans-serif', fontStyle: 'italic' }}>
+        Scroll around to see <strong>{gallery.length - 1}</strong> other drawing{gallery.length - 1 !== 1 ? 's' : ''} submitted today!
         </p>
       </div>
     
