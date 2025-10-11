@@ -376,15 +376,17 @@ useEffect(() => {
         .select('id, image_url, submitted_at, user_id')
         .eq('user_id', uid)
         .eq('prompt_index', currentPromptIndex)
+        .eq('archived', false)  // ADD THIS LINE
         .gte('submitted_at', startOfToday.toISOString())
         .limit(1);
 
       if (submissionError) throw submissionError;
 
       const { count } = await supabase
-        .from('submissions')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', uid);
+      .from('submissions')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', uid)
+      .eq('archived', false);  // ADD THIS LINE - only count non-archived
 
       setSubmissionCount(count || 0);
 
@@ -406,6 +408,7 @@ useEffect(() => {
       .from('submissions')
       .select('id, image_url, stroke_data, submitted_at, user_id')
       .eq('prompt_index', pIndex)
+      .eq('archived', false)  // ADD THIS LINE - only show non-archived
       .order('submitted_at', { ascending: false });
 
     if (error) throw error;
