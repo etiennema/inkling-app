@@ -22,7 +22,10 @@ const formatDate = () => {
   return `${months[date.getMonth()]}. ${date.getDate()} ${date.getFullYear()}`;
 };
 
-const getRandomPosition = (index, total) => {
+const getRandomPosition = (index, total, existingPositions = []) => {
+  const drawingSize = 350;
+  const minDistance = 380; // Minimum distance between centers
+  
   // User's drawing (index 0) is always at center
   if (index === 0) {
     return {
@@ -32,30 +35,61 @@ const getRandomPosition = (index, total) => {
     };
   }
   
-  // All other drawings distributed around the center
+  // Calculate base grid position (same as before)
   const columns = Math.ceil(Math.sqrt(total * 1.5));
   const rows = Math.ceil(total / columns);
   
-  // Adjust index for grid (since index 0 is reserved for user)
   const gridIndex = index - 1;
   const row = Math.floor(gridIndex / columns);
   const col = gridIndex % columns;
   
-  // Center the grid around (0, 0)
   const centerOffsetX = (columns * 400) / 2;
   const centerOffsetY = (rows * 400) / 2;
   
   const baseX = (col * 400) - centerOffsetX;
   const baseY = (row * 400) - centerOffsetY;
   
-  const randomX = (Math.random() - 0.5) * 100;
-  const randomY = (Math.random() - 0.5) * 100;
-  const rotation = (Math.random() - 0.5) * 6;
+  // Try different random offsets until we find one without collision
+  let attempts = 0;
+  const maxAttempts = 20;
   
+  while (attempts < maxAttempts) {
+    const randomX = (Math.random() - 0.5) * 100;
+    const randomY = (Math.random() - 0.5) * 100;
+    
+    const candidateX = baseX + randomX;
+    const candidateY = baseY + randomY;
+    
+    // Check collision with existing positions
+    let hasCollision = false;
+    for (const existing of existingPositions) {
+      const distance = Math.sqrt(
+        Math.pow(candidateX - existing.left, 2) + 
+        Math.pow(candidateY - existing.top, 2)
+      );
+      
+      if (distance < minDistance) {
+        hasCollision = true;
+        break;
+      }
+    }
+    
+    if (!hasCollision) {
+      return {
+        left: candidateX,
+        top: candidateY,
+        rotation: (Math.random() - 0.5) * 6
+      };
+    }
+    
+    attempts++;
+  }
+  
+  // Fallback: use base position with no randomness if all attempts fail
   return {
-    left: baseX + randomX,
-    top: baseY + randomY,
-    rotation
+    left: baseX,
+    top: baseY,
+    rotation: (Math.random() - 0.5) * 6
   };
 };
 
@@ -1267,8 +1301,11 @@ if (screen === 'landing') {
     );
   }
 
-// Calculate gallery container dimensions based on drawing positions
-const positions = gallery.map((_, index) => getRandomPosition(index, gallery.length));
+// Generate positions with collision detection
+const positions = [];
+for (let i = 0; i < gallery.length; i++) {
+  positions.push(getRandomPosition(i, gallery.length, positions));
+}
 
 // User's drawing is always at index 0 and positioned at (0, 0)
 const userDrawingPos = positions[0];
