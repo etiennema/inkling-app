@@ -1324,7 +1324,6 @@ const finalPositions = positions.map(pos => ({
 
 const userFinalPos = finalPositions[0];
 
-console.log('User drawing position:', userDrawingPos);
 console.log('Min/Max X:', minX, maxX);
 console.log('Min/Max Y:', minY, maxY);
 console.log('Container size:', containerWidth, containerHeight);
