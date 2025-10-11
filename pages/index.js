@@ -346,10 +346,13 @@ useEffect(() => {
 
       if (userError) throw userError;
 
-      const now = new Date();
-      // Calculate days since app launch (not user signup)
-      const daysSinceAppStart = Math.floor((now - APP_START_DATE) / (1000 * 60 * 60 * 24));
-      const currentPromptIndex = daysSinceAppStart + 1;
+      // Calculate days based on LOCAL calendar dates, not UTC timestamps
+        const now = new Date();
+        const localToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const appStartLocal = new Date(2025, 9, 11); // Oct 11, 2025 (month is 0-indexed, so 9 = October)
+
+        const daysSinceAppStart = Math.floor((localToday - appStartLocal) / (1000 * 60 * 60 * 24));
+        const currentPromptIndex = daysSinceAppStart + 1;
 
       console.log('Days since app start:', daysSinceAppStart);
       console.log('Current prompt index:', currentPromptIndex);
