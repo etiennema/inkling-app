@@ -111,7 +111,7 @@ function GalleryDrawing({ drawing, index, isUserDrawing }) {
     canvas.width = 350;
     canvas.height = 350;
     
-    ctx.fillStyle = '#F5F5DC';
+    ctx.fillStyle = '#F8F6F2';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
@@ -185,7 +185,7 @@ function GalleryDrawing({ drawing, index, isUserDrawing }) {
         style={{
           width: '100%',
           height: '100%',
-          backgroundColor: '#F5F5DC',
+          backgroundColor: '#F8F6F2',
           opacity: hasAnimated || isAnimating ? 1 : 0.3,
           transition: 'opacity 0.3s ease-in'
         }}
@@ -465,7 +465,7 @@ useEffect(() => {
     canvas.height = size;
 
     const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#F5F5DC';
+    ctx.fillStyle = '#F8F6F2';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
@@ -643,7 +643,7 @@ useEffect(() => {
         document.body.style.backgroundColor = '#FFFFFF';
         
         setTimeout(() => {
-          document.body.style.backgroundColor = '#F5F5DC';
+          document.body.style.backgroundColor = '#F8F6F2';
           setScreen('congrats');
           document.body.style.transition = '';
         }, 200);
@@ -691,7 +691,7 @@ useEffect(() => {
 
   if (screen === 'loading') {
     return (
-      <div style={{ minHeight: '100vh', backgroundColor: '#F5F5DC', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Helvetica, Arial, sans-serif' }}>
+      <div style={{ minHeight: '100vh', backgroundColor: '#F8F6F2', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Helvetica, Arial, sans-serif' }}>
         <div style={{ textAlign: 'center', fontSize: '24px' }}>. . .</div>
       </div>
     );
@@ -704,7 +704,7 @@ useEffect(() => {
       style={{ 
         height: '100vh', 
         minHeight: '-webkit-fill-available', 
-        backgroundColor: '#F5F5DC', 
+        backgroundColor: '#F8F6F2', 
         display: 'flex', 
         alignItems: 'center', 
         justifyContent: 'center', 
@@ -750,7 +750,7 @@ if (screen === 'landing') {
     <div style={{ 
       height: '100vh', 
       minHeight: '-webkit-fill-available', 
-      backgroundColor: '#F5F5DC', 
+      backgroundColor: '#F8F6F2', 
       display: 'flex', 
       alignItems: 'center', 
       justifyContent: 'center', 
@@ -821,7 +821,7 @@ if (screen === 'landing') {
 
   if (screen === 'submitting') {
     return (
-      <div style={{ minHeight: '100vh', backgroundColor: '#F5F5DC', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Helvetica, Arial, sans-serif' }}>
+      <div style={{ minHeight: '100vh', backgroundColor: '#F8F6F2', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Helvetica, Arial, sans-serif' }}>
         <div style={{ textAlign: 'center', fontSize: '48px' }}>{'.'.repeat(submittingDots)}</div>
       </div>
     );
@@ -835,7 +835,7 @@ if (screen === 'landing') {
           minHeight: '-webkit-fill-available',
           display: 'flex',
           flexDirection: 'column',
-          backgroundColor: '#F5F5DC',
+          backgroundColor: '#F8F6F2',
           overflow: 'hidden',
           fontFamily: 'Helvetica, Arial, sans-serif',
           boxSizing: 'border-box',
@@ -942,7 +942,7 @@ if (screen === 'landing') {
           style={{ 
             height: '100vh',
             minHeight: '-webkit-fill-available',
-            backgroundColor: '#F5F5DC', 
+            backgroundColor: '#F8F6F2', 
             display: 'flex', 
             alignItems: 'center', 
             justifyContent: 'center', 
@@ -996,7 +996,7 @@ if (screen === 'landing') {
       style={{ 
         height: '100vh',
         minHeight: '-webkit-fill-available',
-        backgroundColor: '#F5F5DC', 
+        backgroundColor: '#F8F6F2', 
         display: 'flex', 
         flexDirection: 'column',
         alignItems: 'center', 
@@ -1131,7 +1131,7 @@ if (screen === 'landing') {
 
   if (screen === 'already-done') {
     return (
-      <div style={{ minHeight: '100vh', backgroundColor: '#F5F5DC', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'Helvetica, Arial, sans-serif' }}>
+      <div style={{ minHeight: '100vh', backgroundColor: '#F8F6F2', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'Helvetica, Arial, sans-serif' }}>
         <div style={{ textAlign: 'center' }}>
           <p style={{ fontSize: '18px', marginBottom: '16px' }}>ALL DONE FOR TODAY.</p>
           <p style={{ marginBottom: '32px' }}>COME BACK TOMORROW!</p>
@@ -1159,7 +1159,7 @@ if (screen === 'landing') {
   if (screen === 'gallery') {
   if (galleryState === 'loading') {
     return (
-      <div style={{ minHeight: '100vh', backgroundColor: '#F5F5DC', padding: '40px 20px', fontFamily: 'Helvetica, Arial, sans-serif' }}>
+      <div style={{ minHeight: '100vh', backgroundColor: '#F8F6F2', padding: '40px 20px', fontFamily: 'Helvetica, Arial, sans-serif' }}>
         <h1 style={{ fontSize: 'clamp(48px, 10vw, 72px)', fontWeight: 'bold', margin: '0 0 16px 0', textAlign: 'center' }}>
           GALLERY
         </h1>
@@ -1182,7 +1182,7 @@ if (screen === 'landing') {
         }}
         style={{ 
           minHeight: '100vh', 
-          backgroundColor: '#F5F5DC', 
+          backgroundColor: '#F8F6F2', 
           display: 'flex', 
           alignItems: 'center', 
           justifyContent: 'center', 
@@ -1228,7 +1228,7 @@ if (screen === 'landing') {
   if (galleryState === 'first') {
     const userDrawing = gallery[0];
     return (
-      <div style={{ minHeight: '100vh', backgroundColor: '#F5F5DC', padding: '40px 20px', fontFamily: 'Helvetica, Arial, sans-serif', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <div style={{ minHeight: '100vh', backgroundColor: '#F8F6F2', padding: '40px 20px', fontFamily: 'Helvetica, Arial, sans-serif', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <h1 style={{ fontSize: 'clamp(48px, 10vw, 72px)', fontWeight: 'bold', margin: '0 0 16px 0', textAlign: 'center' }}>
           GALLERY
         </h1>
@@ -1300,7 +1300,7 @@ console.log('Offsets:', offsetX, offsetY);
 console.log('User final position:', userFinalPos);
 
 return (
-  <div style={{ height: '100vh', backgroundColor: '#F5F5DC', fontFamily: 'Helvetica, Arial, sans-serif', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+  <div style={{ height: '100vh', backgroundColor: '#F8F6F2', fontFamily: 'Helvetica, Arial, sans-serif', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
     {/* Header - scrolls with content */}
     <div style={{ padding: '40px 20px 20px', flexShrink: 0 }}>
       <h1 style={{ fontSize: 'clamp(48px, 10vw, 72px)', fontWeight: 'bold', margin: '0 0 16px 0', textAlign: 'center' }}>
