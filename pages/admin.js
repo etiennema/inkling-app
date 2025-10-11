@@ -303,65 +303,71 @@ const loadMilestoneEmails = async () => {
         )}
 
         {loading ? (
-          <p style={{ fontSize: '24px', textAlign: 'center' }}>Loading...</p>
-        ) : (
-         <div
-            key={submission.id}
-            style={{
-                border: '2px solid #000',
-                padding: '16px',
-                backgroundColor: submission.archived ? '#FFE6E6' : '#fff',  // CHANGED
-                opacity: submission.archived ? 0.6 : 1  // ADDED
-            }}
->
-                <img
-                  src={submission.image_url}
-                  alt="Submission"
-                  style={{
-                    width: '100%',
-                    aspectRatio: '1/1',
-                    objectFit: 'cover',
-                    marginBottom: '12px',
-                    border: '1px solid #ddd'
-                  }}
-                />
-                <p style={{ margin: '0 0 8px 0', fontSize: '14px' }}>
-                    <strong>"{submission.prompt_text}" (Prompt #{submission.prompt_index})</strong>
-                    {submission.archived && <span style={{ color: '#FF0000', marginLeft: '8px' }}>[ARCHIVED]</span>}
-                </p>
-                <p style={{ margin: '0 0 8px 0', fontSize: '12px', color: '#666' }}>
-                  {formatDate(submission.submitted_at)}
-                </p>
-                <p style={{ margin: '0 0 16px 0', fontSize: '12px', color: '#666' }}>
-                  User: {submission.user_id.substring(0, 8)}...
-                </p>
-                <button
-                  onClick={() => handleDelete(submission)}
-                  disabled={deletingId === submission.id}
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    fontSize: '14px',
-                    backgroundColor: deletingId === submission.id ? '#ccc' : '#FF0000',
-                    color: '#fff',
-                    border: 'none',
-                    cursor: deletingId === submission.id ? 'not-allowed' : 'pointer',
-                    fontFamily: 'Helvetica, Arial, sans-serif',
-                    fontWeight: '500'
-                  }}
-                >
-                  {deletingId === submission.id ? 'DELETING...' : 'DELETE'}
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
+  <p style={{ fontSize: '24px', textAlign: 'center' }}>Loading...</p>
+) : (
+  <div style={{
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+    gap: '24px'
+  }}>
+    {submissions.map(submission => (
+      <div
+        key={submission.id}
+        style={{
+          border: '2px solid #000',
+          padding: '16px',
+          backgroundColor: submission.archived ? '#FFE6E6' : '#fff',
+          opacity: submission.archived ? 0.6 : 1
+        }}
+      >
+        <img
+          src={submission.image_url}
+          alt="Submission"
+          style={{
+            width: '100%',
+            aspectRatio: '1/1',
+            objectFit: 'cover',
+            marginBottom: '12px',
+            border: '1px solid #ddd'
+          }}
+        />
+        <p style={{ margin: '0 0 8px 0', fontSize: '14px' }}>
+          <strong>"{submission.prompt_text}" (Prompt #{submission.prompt_index})</strong>
+          {submission.archived && <span style={{ color: '#FF0000', marginLeft: '8px' }}>[ARCHIVED]</span>}
+        </p>
+        <p style={{ margin: '0 0 8px 0', fontSize: '12px', color: '#666' }}>
+          {formatDate(submission.submitted_at)}
+        </p>
+        <p style={{ margin: '0 0 16px 0', fontSize: '12px', color: '#666' }}>
+          User: {submission.user_id.substring(0, 8)}...
+        </p>
+        <button
+          onClick={() => handleDelete(submission)}
+          disabled={deletingId === submission.id}
+          style={{
+            width: '100%',
+            padding: '12px',
+            fontSize: '14px',
+            backgroundColor: deletingId === submission.id ? '#ccc' : '#FF0000',
+            color: '#fff',
+            border: 'none',
+            cursor: deletingId === submission.id ? 'not-allowed' : 'pointer',
+            fontFamily: 'Helvetica, Arial, sans-serif',
+            fontWeight: '500'
+          }}
+        >
+          {deletingId === submission.id ? 'DELETING...' : 'DELETE'}
+        </button>
+      </div>
+    ))}
+  </div>
+)}
 
-        {!loading && submissions.length === 0 && (
-          <p style={{ textAlign: 'center', fontSize: '18px', marginTop: '60px' }}>
-            No submissions yet.
-          </p>
-        )}
+{!loading && submissions.length === 0 && (
+  <p style={{ textAlign: 'center', fontSize: '18px', marginTop: '60px' }}>
+    No submissions yet.
+  </p>
+)}
       </div>
     </div>
   );
