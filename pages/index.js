@@ -1363,9 +1363,9 @@ return (
       data-gallery-container
       ref={(el) => {
         if (el && galleryState === 'loaded') {
-          // Center user's drawing horizontally, start at top vertically
+          // Center user's drawing horizontally and position it nicely from top
           const scrollX = userFinalPos.left - (window.innerWidth / 2);
-          const scrollY = 0;
+          const scrollY = userFinalPos.top - 300;
           el.scrollTo(scrollX, scrollY);
         }
       }}
