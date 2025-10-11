@@ -1364,13 +1364,16 @@ return (
   <div style={{ height: '100vh', backgroundColor: '#F8F6F2', fontFamily: 'Helvetica, Arial, sans-serif', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
     {/* Header - scrolls with content */}
     <div style={{ padding: '40px 20px 20px', flexShrink: 0 }}>
-      <h1 style={{ fontSize: 'clamp(48px, 10vw, 72px)', fontWeight: 'bold', margin: '0 0 16px 0', textAlign: 'center' }}>
-        GALLERY
-      </h1>
-      <p style={{ fontSize: 'clamp(16px, 3vw, 20px)', textAlign: 'center', margin: 0 }}>
-        {formatDate()}
-      </p>
-    </div>
+        <h1 style={{ fontSize: 'clamp(48px, 10vw, 72px)', fontWeight: 'bold', margin: '0 0 16px 0', textAlign: 'center' }}>
+          GALLERY
+        </h1>
+        <p style={{ fontSize: 'clamp(16px, 3vw, 20px)', textAlign: 'center', margin: '0' }}>
+          {formatDate()}
+        </p>
+        <p style={{ fontSize: 'clamp(12px, 2.5vw, 14px)', textAlign: 'center', margin: '0', fontFamily: 'Helvetica, Arial, sans-serif' }}>
+          (Scroll around to see {gallery.length - 1} other drawing{gallery.length - 1 !== 1 ? 's' : ''} submitted today!)
+        </p>
+      </div>
     
     {/* Scrollable gallery container */}
     <div 
