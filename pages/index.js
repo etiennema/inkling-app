@@ -1267,32 +1267,55 @@ if (screen === 'landing') {
     );
   }
 
-const positions = gallery.map((_, index) => getRandomPosition(index, gallery.length));
-
-// User's drawing is always at index 0 and positioned at (0, 0)
-const userDrawingPos = positions[0];
-
-// Find the bounds of all drawings
-const minX = Math.min(...positions.map(p => p.left));
-const maxX = Math.max(...positions.map(p => p.left));
-const minY = Math.min(...positions.map(p => p.top));
-const maxY = Math.max(...positions.map(p => p.top));
-
-// Calculate dimensions with tighter padding
-const topMargin = 250; // Space for header
-const padding = 50; // Reduced padding
+// Simple layout: user at top-center, others flow around and below
 const drawingSize = 350;
+const positions = [];
 
-// Container needs to fit from minX to maxX, plus half a drawing on each side, plus small padding
+// Calculate positions
+gallery.forEach((item, index) => {
+  if (index === 0) {
+    // User's drawing: fixed at top-center
+    positions.push({
+      left: 0,
+      top: 0,
+      rotation: (Math.random() - 0.5) * 6
+    });
+  } else {
+    // Other drawings: arranged in expanding rows below
+    const itemsPerRow = Math.min(3, gallery.length - 1); // Max 3 per row
+    const row = Math.floor((index - 1) / itemsPerRow);
+    const col = (index - 1) % itemsPerRow;
+    
+    // Center each row
+    const rowWidth = Math.min(itemsPerRow, gallery.length - 1 - (row * itemsPerRow)) * 450;
+    const startX = -(rowWidth / 2) + 225;
+    
+    positions.push({
+      left: startX + (col * 450) + ((Math.random() - 0.5) * 80),
+      top: 500 + (row * 450) + ((Math.random() - 0.5) * 80),
+      rotation: (Math.random() - 0.5) * 8
+    });
+  }
+});
+
+// Calculate container size to fit all drawings
+const allX = positions.map(p => p.left);
+const allY = positions.map(p => p.top);
+const minX = Math.min(...allX);
+const maxX = Math.max(...allX);
+const minY = Math.min(...allY);
+const maxY = Math.max(...allY);
+
+const topMargin = 250;
+const padding = 225;
+
 const containerWidth = (maxX - minX) + drawingSize + (padding * 2);
 const containerHeight = (maxY - minY) + drawingSize + topMargin + padding;
 
-// Calculate offsets - user at (0,0) should end up centered horizontally and at topMargin vertically
-const horizontalCenter = containerWidth / 2;
+// Calculate final positions with offsets
 const offsetX = -minX + padding + (drawingSize / 2);
-const offsetY = -minY + topMargin;
+const offsetY = topMargin;
 
-// Calculate final positions
 const finalPositions = positions.map(pos => ({
   left: pos.left + offsetX,
   top: pos.top + offsetY,
