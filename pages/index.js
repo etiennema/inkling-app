@@ -1371,7 +1371,7 @@ return (
           {formatDate()}
         </p>
         <p style={{ fontSize: 'clamp(12px, 2.5vw, 14px)', textAlign: 'center', margin: '0', fontFamily: 'Helvetica, Arial, sans-serif', fontStyle: 'italic' }}>
-        Scroll around to see <strong>{gallery.length - 1}</strong> other drawing{gallery.length - 1 !== 1 ? 's' : ''} submitted today!
+        Scroll around to see the <strong>{gallery.length - 1}</strong> other drawing{gallery.length - 1 !== 1 ? 's' : ''} submitted today!
         </p>
       </div>
     
