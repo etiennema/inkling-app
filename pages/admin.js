@@ -167,9 +167,6 @@ const loadMilestoneEmails = async () => {
   }
 };
 
-const handleDelete = async (submission) => {
-  // existing code continues...
-  
   const handleDelete = async (submission) => {
   if (!confirm(`Delete this submission: "${submission.prompt_text}" (Prompt #${submission.prompt_index})?`)) {
     return;
@@ -217,85 +214,6 @@ const handleDelete = async (submission) => {
     console.error('Error deleting submission:', err);
     alert(`Failed to delete submission: ${err.message}`);
   } finally {
-    setDeletingId(null);
-  }
-};
-
-const exportDrawingVideo = async (submission) => {
-  setDeletingId(submission.id); // Reuse this state for "busy" indicator
-  
-  try {
-    // Create a temporary canvas for recording
-    const canvas = document.createElement('canvas');
-    canvas.width = 1080;
-    canvas.height = 1080;
-    const ctx = canvas.getContext('2d');
-    
-    // Set up canvas
-    ctx.fillStyle = '#F5F5DC';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    
-    // Start recording
-    const stream = canvas.captureStream(60); // 60fps
-    const mediaRecorder = new MediaRecorder(stream, {
-      mimeType: 'video/webm;codecs=vp9',
-      videoBitsPerSecision: 5000000
-    });
-    
-    const chunks = [];
-    mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
-    
-    mediaRecorder.onstop = () => {
-      const blob = new Blob(chunks, { type: 'video/webm' });
-      const url = URL.createObjectURL(blob);
-      
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `inkling-${submission.id}.webm`;
-      a.click();
-      
-      setDeletingId(null);
-      alert('Video exported! Convert to MP4 at cloudconvert.com or with HandBrake.');
-    };
-    
-    mediaRecorder.start();
-    
-    // Animate the drawing
-    const strokes = submission.stroke_data?.strokes || [];
-    const scale = 1080 / 350; // Scale from canvas size to export size
-    
-    for (const stroke of strokes) {
-      ctx.beginPath();
-      ctx.strokeStyle = stroke.color;
-      ctx.lineWidth = 5 * scale;
-      
-      for (let i = 0; i < stroke.points.length; i++) {
-        const point = stroke.points[i];
-        const x = point.x * scale;
-        const y = point.y * scale;
-        
-        if (i === 0) {
-          ctx.moveTo(x, y);
-        } else {
-          ctx.lineTo(x, y);
-          ctx.stroke();
-        }
-        
-        // Small delay to control animation speed
-        await new Promise(resolve => setTimeout(resolve, 10)); // Adjust speed here
-      }
-    }
-    
-    // Hold final frame for 1 second
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    mediaRecorder.stop();
-    
-  } catch (err) {
-    console.error('Export failed:', err);
-    alert(`Failed to export video: ${err.message}`);
     setDeletingId(null);
   }
 };
@@ -503,7 +421,7 @@ const exportDrawingVideo = async (submission) => {
           User: {submission.user_id.substring(0, 8)}...
         </p>
         
-          <button
+        <button
                   onClick={() => exportDrawingVideo(submission)}
                   disabled={exportingId === submission.id}
                   style={{
@@ -520,7 +438,7 @@ const exportDrawingVideo = async (submission) => {
                   }}
                 >
                   {exportingId === submission.id ? 'EXPORTING...' : 'EXPORT VIDEO'}
-                </button>
+        </button>
         
         <button
           onClick={() => handleDelete(submission)}
