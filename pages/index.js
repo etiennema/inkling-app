@@ -595,8 +595,10 @@ useEffect(() => {
   };
 
   const handleAutoSubmit = async () => {
-    const coverage = calculateCoverage();
-    const drawingTime = firstStrokeTime ? (Date.now() - firstStrokeTime) / 1000 : 0;
+      console.log('🚨 AUTO SUBMIT TRIGGERED');
+      const coverage = calculateCoverage();
+      const drawingTime = firstStrokeTime ? (Date.now() - firstStrokeTime) / 1000 : 0;
+      console.log('Coverage:', coverage, 'Time:', drawingTime);
 
     if (coverage < MIN_COVERAGE) {
       setErrorMessage('blank');
