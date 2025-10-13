@@ -129,7 +129,7 @@ const loadMilestoneEmails = async () => {
     
     const strokes = submission.stroke_data?.strokes || [];
     
-    // FIXED: Find the actual bounds of the drawing (min AND max)
+    // Find the bounds of the drawing
     let minX = Infinity;
     let minY = Infinity;
     let maxX = 0;
@@ -144,17 +144,22 @@ const loadMilestoneEmails = async () => {
       });
     });
     
-    // Calculate the drawing dimensions
-    const drawingWidth = maxX - minX;
-    const drawingHeight = maxY - minY;
-    const drawingSize = Math.max(drawingWidth, drawingHeight);
+    // Determine original canvas size based on coordinate range
+    const maxCoordinate = Math.max(maxX, maxY);
     
-    // Calculate scale to fit in 1080x1080
-    const scale = drawingSize > 0 ? 1080 / drawingSize : 1;
+    let originalCanvasSize;
+    if (maxCoordinate > 400) {
+      // Drawing uses high coordinates - likely desktop with large canvas
+      // Max canvas size in the app is 600x600
+      originalCanvasSize = 600;
+    } else {
+      // Drawing uses lower coordinates - likely mobile or centered desktop
+      // Use the actual bounds plus some padding
+      originalCanvasSize = Math.max(maxX, maxY, 350);
+    }
     
-    // Calculate offsets to center the drawing
-    const offsetX = -minX * scale + (1080 - drawingWidth * scale) / 2;
-    const offsetY = -minY * scale + (1080 - drawingHeight * scale) / 2;
+    // Scale to fit 1080x1080 export
+    const scale = 1080 / originalCanvasSize;
     
     // Animate the drawing
     for (const stroke of strokes) {
@@ -164,8 +169,8 @@ const loadMilestoneEmails = async () => {
       
       for (let i = 0; i < stroke.points.length; i++) {
         const point = stroke.points[i];
-        const x = point.x * scale + offsetX;
-        const y = point.y * scale + offsetY;
+        const x = point.x * scale;
+        const y = point.y * scale;
         
         if (i === 0) {
           ctx.moveTo(x, y);
