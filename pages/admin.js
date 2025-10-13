@@ -93,19 +93,16 @@ const loadMilestoneEmails = async () => {
   setExportingId(submission.id);
   
   try {
-    // Create a temporary canvas for recording
     const canvas = document.createElement('canvas');
     canvas.width = 1080;
     canvas.height = 1080;
     const ctx = canvas.getContext('2d');
     
-    // Set up canvas
     ctx.fillStyle = '#F5F5DC';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     
-    // Start recording
     const stream = canvas.captureStream(60);
     const mediaRecorder = new MediaRecorder(stream, {
       mimeType: 'video/webm;codecs=vp9',
@@ -130,10 +127,23 @@ const loadMilestoneEmails = async () => {
     
     mediaRecorder.start();
     
-    // Animate the drawing
     const strokes = submission.stroke_data?.strokes || [];
-    const scale = 1080 / 350;
     
+    // FIXED: Find the actual bounds of the drawing
+    let maxX = 0;
+    let maxY = 0;
+    strokes.forEach(stroke => {
+      stroke.points.forEach(point => {
+        if (point.x > maxX) maxX = point.x;
+        if (point.y > maxY) maxY = point.y;
+      });
+    });
+    
+    // Calculate scale based on actual drawing size
+    const originalSize = Math.max(maxX, maxY);
+    const scale = originalSize > 0 ? 1080 / originalSize : 1;
+    
+    // Animate the drawing
     for (const stroke of strokes) {
       ctx.beginPath();
       ctx.strokeStyle = stroke.color;
