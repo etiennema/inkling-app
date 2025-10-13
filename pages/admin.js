@@ -129,19 +129,32 @@ const loadMilestoneEmails = async () => {
     
     const strokes = submission.stroke_data?.strokes || [];
     
-    // FIXED: Find the actual bounds of the drawing
+    // FIXED: Find the actual bounds of the drawing (min AND max)
+    let minX = Infinity;
+    let minY = Infinity;
     let maxX = 0;
     let maxY = 0;
+    
     strokes.forEach(stroke => {
       stroke.points.forEach(point => {
+        if (point.x < minX) minX = point.x;
+        if (point.y < minY) minY = point.y;
         if (point.x > maxX) maxX = point.x;
         if (point.y > maxY) maxY = point.y;
       });
     });
     
-    // Calculate scale based on actual drawing size
-    const originalSize = Math.max(maxX, maxY);
-    const scale = originalSize > 0 ? 1080 / originalSize : 1;
+    // Calculate the drawing dimensions
+    const drawingWidth = maxX - minX;
+    const drawingHeight = maxY - minY;
+    const drawingSize = Math.max(drawingWidth, drawingHeight);
+    
+    // Calculate scale to fit in 1080x1080
+    const scale = drawingSize > 0 ? 1080 / drawingSize : 1;
+    
+    // Calculate offsets to center the drawing
+    const offsetX = -minX * scale + (1080 - drawingWidth * scale) / 2;
+    const offsetY = -minY * scale + (1080 - drawingHeight * scale) / 2;
     
     // Animate the drawing
     for (const stroke of strokes) {
@@ -151,8 +164,8 @@ const loadMilestoneEmails = async () => {
       
       for (let i = 0; i < stroke.points.length; i++) {
         const point = stroke.points[i];
-        const x = point.x * scale;
-        const y = point.y * scale;
+        const x = point.x * scale + offsetX;
+        const y = point.y * scale + offsetY;
         
         if (i === 0) {
           ctx.moveTo(x, y);
