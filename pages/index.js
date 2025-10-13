@@ -204,8 +204,7 @@ export default function Home() {
   const [currentStroke, setCurrentStroke] = useState([]);
   const [drawingStartTime, setDrawingStartTime] = useState(null);
   const [firstStrokeTime, setFirstStrokeTime] = useState(null);
-  const [todayPrompt, setTodayPrompt] = useState('');
-  const [promptIndex, setPromptIndex] = useState(0);
+const [currentPrompt, setCurrentPrompt] = useState({ index: 0, text: '' });
   const [gallery, setGallery] = useState([]);
   const [submissionCount, setSubmissionCount] = useState(0);
   const [errorMessage, setErrorMessage] = useState('');
@@ -352,24 +351,27 @@ useEffect(() => {
         const appStartLocal = new Date(2025, 9, 11); // Oct 11, 2025 (month is 0-indexed, so 9 = October)
 
         const daysSinceAppStart = Math.floor((localToday - appStartLocal) / (1000 * 60 * 60 * 24));
-        const currentPromptIndex = daysSinceAppStart + 1;
+        const current = daysSinceAppStart + 1;
 
       console.log('Days since app start:', daysSinceAppStart);
-      console.log('Current prompt index:', currentPromptIndex);
-
-      setPromptIndex(currentPromptIndex);
+      console.log('Current prompt index:', current);
 
       const { data: prompt } = await supabase
         .from('prompts')
         .select('prompt_text')
-        .eq('prompt_index', currentPromptIndex)
+        .eq('prompt_index', current)
         .maybeSingle();
 
-      if (prompt) {
-        setTodayPrompt(prompt.prompt_text);
-      } else {
-        setTodayPrompt('draw');
-      }
+      // Set both index and text together atomically
+      setCurrentPrompt({
+        index: current,
+        text: prompt?.prompt_text || 'draw'
+      });
+
+      console.log('Prompt set:', { 
+        index: current, 
+        text: prompt?.prompt_text || 'draw' 
+      });
 
       const startOfToday = new Date();
       startOfToday.setHours(0, 0, 0, 0);
@@ -378,7 +380,7 @@ useEffect(() => {
         .from('submissions')
         .select('id, image_url, submitted_at, user_id')
         .eq('user_id', uid)
-        .eq('prompt_index', currentPromptIndex)
+        .eq('prompt_index', current)
         .eq('archived', false)  // ADD THIS LINE
         .gte('submitted_at', startOfToday.toISOString())
         .limit(1);
@@ -394,7 +396,7 @@ useEffect(() => {
       setSubmissionCount(count || 0);
 
       if (submissions && submissions.length > 0) {
-        await loadGallery(currentPromptIndex);
+        await loadGallery(current);
         setScreen('already-done');
       } else {
         setScreen('landing');
@@ -631,22 +633,22 @@ useEffect(() => {
         .from('drawings')
         .getPublicUrl(fileName);
 
-      const { error: insertError } = await supabase
-        .from('submissions')
-        .insert({
-          user_id: userId,
-          prompt_index: promptIndex,
-          image_url: publicUrl,
-          stroke_data: { strokes },
-          canvas_coverage: coverage,
-          drawing_duration: Math.floor(drawingTime)
-        });
+        const { error: insertError } = await supabase
+          .from('submissions')
+          .insert({
+            user_id: userId,
+            prompt_index: currentPrompt.index,
+            image_url: publicUrl,
+            stroke_data: { strokes },
+            canvas_coverage: coverage,
+            drawing_duration: Math.floor(drawingTime)
+          });
 
       if (insertError) throw insertError;
 
       setLastSubmittedImage(publicUrl);
       setSubmissionCount(prev => prev + 1);
-      await loadGallery(promptIndex);
+      await loadGallery(currentPrompt.index);
 
       const dotInterval = setInterval(() => {
         setSubmittingDots(prev => prev === 3 ? 1 : prev + 1);
@@ -868,7 +870,7 @@ if (screen === 'landing') {
             flexShrink: 0
           }}
         >
-          "{todayPrompt}"
+          "{currentPrompt.text}"
         </h2>
 
         <div style={{ flex: '1', minHeight: 0 }}></div>
@@ -1193,7 +1195,7 @@ if (screen === 'landing') {
       <div 
         onClick={() => {
           setGalleryState('loading');
-          loadGallery(promptIndex);
+          loadGallery(currentPrompt.index);
         }}
         style={{ 
           minHeight: '100vh', 
