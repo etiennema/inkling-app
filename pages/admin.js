@@ -6,6 +6,12 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 );
 
+// Admin client with service role for delete operations
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
+
 const ADMIN_PASSWORD = 'inkling2025';
 
 export default function Admin() {
@@ -210,7 +216,7 @@ const loadMilestoneEmails = async () => {
 
     // Try to delete from storage (don't fail if file doesn't exist)
     if (filename) {
-      const { error: storageError } = await supabase.storage
+      const { error: storageError } = await supabaseAdmin.storage
         .from('drawings')
         .remove([filename]);
 
@@ -223,9 +229,9 @@ const loadMilestoneEmails = async () => {
     }
 
     // Delete from database - this is the critical one
-    const { error: dbError } = await supabase
-      .from('submissions')
-      .delete()
+    const { error: dbError } = await supabaseAdmin
+    .from('submissions')
+    .delete()
       .eq('id', submission.id);
 
     if (dbError) {
