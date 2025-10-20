@@ -103,10 +103,32 @@ const loadMilestoneEmails = async () => {
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     
+    const strokes = submission.stroke_data?.strokes || [];
+    
+    if (strokes.length === 0) {
+      alert('No stroke data available for this submission');
+      setExportingId(null);
+      return;
+    }
+    
+    // Find max coordinates to calculate scale (same as gallery)
+    let maxX = 0;
+    let maxY = 0;
+    strokes.forEach(stroke => {
+      stroke.points.forEach(point => {
+        if (point.x > maxX) maxX = point.x;
+        if (point.y > maxY) maxY = point.y;
+      });
+    });
+    
+    const originalSize = Math.max(maxX, maxY);
+    const scale = originalSize > 0 ? 1080 / originalSize : 1;
+    
+    // Set up MediaRecorder
     const stream = canvas.captureStream(60);
     const mediaRecorder = new MediaRecorder(stream, {
       mimeType: 'video/webm;codecs=vp9',
-      videoBitsPerSecond: 5000000
+      videoBitsPerSecond: 8000000 // Higher quality
     });
     
     const chunks = [];
@@ -115,78 +137,56 @@ const loadMilestoneEmails = async () => {
     mediaRecorder.onstop = () => {
       const blob = new Blob(chunks, { type: 'video/webm' });
       const url = URL.createObjectURL(blob);
-      
       const a = document.createElement('a');
       a.href = url;
-      a.download = `inkling-${submission.id}.webm`;
+      a.download = `inkling-${submission.prompt_text}-${submission.id}.webm`;
       a.click();
-      
+      URL.revokeObjectURL(url);
       setExportingId(null);
-      alert('Video exported! Convert to MP4 at cloudconvert.com or with HandBrake.');
+      alert('Video exported successfully!');
     };
     
     mediaRecorder.start();
     
-    const strokes = submission.stroke_data?.strokes || [];
+    // Animate strokes with same timing as gallery
+    let currentStrokeIndex = 0;
+    let currentPointIndex = 0;
     
-    // Find the bounds of the drawing
-    let minX = Infinity;
-    let minY = Infinity;
-    let maxX = 0;
-    let maxY = 0;
-    
-    strokes.forEach(stroke => {
-      stroke.points.forEach(point => {
-        if (point.x < minX) minX = point.x;
-        if (point.y < minY) minY = point.y;
-        if (point.x > maxX) maxX = point.x;
-        if (point.y > maxY) maxY = point.y;
-      });
-    });
-    
-    // Determine original canvas size based on coordinate range
-    const maxCoordinate = Math.max(maxX, maxY);
-    
-    let originalCanvasSize;
-    if (maxCoordinate > 400) {
-      // Drawing uses high coordinates - likely desktop with large canvas
-      // Max canvas size in the app is 600x600
-      originalCanvasSize = 600;
-    } else {
-      // Drawing uses lower coordinates - likely mobile or centered desktop
-      // Use the actual bounds plus some padding
-      originalCanvasSize = Math.max(maxX, maxY, 350);
-    }
-    
-    // Scale to fit 1080x1080 export
-    const scale = 1080 / originalCanvasSize;
-    
-    // Animate the drawing
-    for (const stroke of strokes) {
-      ctx.beginPath();
-      ctx.strokeStyle = stroke.color;
-      ctx.lineWidth = 5 * scale;
-      
-      for (let i = 0; i < stroke.points.length; i++) {
-        const point = stroke.points[i];
-        const x = point.x * scale;
-        const y = point.y * scale;
-        
-        if (i === 0) {
-          ctx.moveTo(x, y);
-        } else {
-          ctx.lineTo(x, y);
-          ctx.stroke();
-        }
-        
-        await new Promise(resolve => requestAnimationFrame(resolve));
+    const animateStrokes = () => {
+      if (currentStrokeIndex >= strokes.length) {
+        // Hold final frame for 500ms then stop
+        setTimeout(() => {
+          mediaRecorder.stop();
+        }, 500);
+        return;
       }
-    }
+      
+      const stroke = strokes[currentStrokeIndex];
+      const points = stroke.points;
+      
+      if (currentPointIndex === 0) {
+        ctx.beginPath();
+        ctx.moveTo(points[0].x * scale, points[0].y * scale);
+        ctx.strokeStyle = stroke.color;
+        ctx.lineWidth = 5 * scale;
+      }
+      
+      if (currentPointIndex < points.length) {
+        const point = points[currentPointIndex];
+        ctx.lineTo(point.x * scale, point.y * scale);
+        ctx.stroke();
+        currentPointIndex++;
+        
+        // Same speed as gallery: 10ms / 1.25 = 8ms per point
+        setTimeout(animateStrokes, 8);
+      } else {
+        currentStrokeIndex++;
+        currentPointIndex = 0;
+        setTimeout(animateStrokes, 50); // 50ms pause between strokes
+      }
+    };
     
-    // Hold final frame for 1 second
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    mediaRecorder.stop();
+    animateStrokes();
     
   } catch (err) {
     console.error('Export failed:', err);
