@@ -6,13 +6,7 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 );
 
-// Admin client with service role for delete operations
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY
-);
-
-const ADMIN_PASSWORD = 'inkling2025';
+const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
 
 export default function Admin() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -207,41 +201,24 @@ const loadMilestoneEmails = async () => {
   }
 
   setDeletingId(submission.id);
+  
   try {
-    // Extract filename from URL
-    const url = submission.image_url;
-    const filename = url.split('/drawings/')[1]?.split('?')[0];
+    const response = await fetch('/api/admin-delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        submissionId: submission.id,
+        imageUrl: submission.image_url,
+        password: password // Uses the password from login
+      })
+    });
 
-    console.log('Attempting to delete:', filename);
+    const data = await response.json();
 
-    // Try to delete from storage (don't fail if file doesn't exist)
-    if (filename) {
-      const { error: storageError } = await supabaseAdmin.storage
-        .from('drawings')
-        .remove([filename]);
-
-      if (storageError) {
-        console.warn('Storage deletion warning (file may not exist):', storageError);
-        // Don't throw - continue to delete from database anyway
-      } else {
-        console.log('Storage file deleted successfully');
-      }
+    if (!response.ok) {
+      throw new Error(data.error || 'Delete failed');
     }
 
-    // Delete from database - this is the critical one
-    const { error: dbError } = await supabaseAdmin
-    .from('submissions')
-    .delete()
-      .eq('id', submission.id);
-
-    if (dbError) {
-      console.error('Database deletion error:', dbError);
-      throw dbError;
-    }
-
-    console.log('Database record deleted successfully');
-
-    // Remove from local state
     setSubmissions(prev => prev.filter(s => s.id !== submission.id));
     alert('Submission deleted successfully');
   } catch (err) {
