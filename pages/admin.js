@@ -9,7 +9,7 @@ const supabase = createClient(
 // Admin client with service role for delete operations
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
+  process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY
 );
 
 const ADMIN_PASSWORD = 'inkling2025';
