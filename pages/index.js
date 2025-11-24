@@ -1153,6 +1153,9 @@ if (screen === 'landing') {
           <p style={{ fontSize: '18px', marginBottom: '16px' }}>ALL DONE FOR TODAY.</p>
           <p style={{ marginBottom: '32px' }}><strong><u>COME BACK TOMORROW FOR A NEW PROMPT!</u></strong></p>
           <p style={{ fontSize: '32px', fontFamily: 'monospace', marginBottom: '32px' }}>{countdown || getTimeUntilMidnight()}</p>
+          <p style={{ fontSize: '16px', marginBottom: '32px', lineHeight: '1.4' }}>
+            If you'd like to get (mostly) daily reminders, follow <a href="https://instagram.com/mimo.projects" target="_blank" rel="noopener noreferrer" style={{ color: '#0066FF', textDecoration: 'underline' }}>Mimo Projects</a>
+          </p>
           <button
             onClick={() => setScreen('gallery')}
             style={{
